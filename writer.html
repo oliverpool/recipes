@@ -166,9 +166,7 @@ input[type="number"]{
   width: 15em;
 }
 
-.ingredient.-raw button.remove{
-  position: absolute;
-  top: 0;
+button.remove{
   border-radius: 50%;
   border: none;
   background-color: red;
@@ -177,6 +175,11 @@ input[type="number"]{
   width: 25px;
   height: 25px;
   font-size: 1.5em;
+}
+
+.ingredient.-raw button.remove{
+  position: absolute;
+  top: 0;
 }
 .ingredient.-raw button.remove:hover,
 .ingredient.-raw:focus button.remove,
@@ -195,8 +198,21 @@ input[type="number"]{
   width: 25px;
   height: 25px;
 }
+
+.action > button.remove{
+  position: absolute;
+  bottom:0;
+  right:0;
+  visibility: hidden;
+}
+
+.action[data-ingredients='0']:hover > button.remove,
 .action:hover > button.add{
   opacity: .7;
+  visibility: visible;
+}
+.step.recipe > .step-actions > .action:last-of-type button.remove{
+  display: none;
 }
   </style>
 
@@ -232,33 +248,7 @@ Vue.component('recipe-ingredient', {
     }
   },
 });
-Vue.component('recipe-quantity', {
-  template: '#recipe-quantity-template',
-  props: {
-    model: Object
-  },
-});
- 
- 
- 
-Vue.component('recipe-step', {
-  template: '#recipe-step-template',
-  props: {
-    model: Object
-  },
-  computed: {
-    allContainers:  function () {
-      var containers = [this.model];
-      var current_container = this.model;
-      while(typeof current_container.container === 'object'){
-        containers.unshift(current_container.container);
-        current_container = current_container.container;
-      }
-      return containers;
-    },
-  },
- });
-  
+
 Vue.component('recipe-ingredient-adder', {
   template: '#recipe-ingredient-adder-template',
   props: {
@@ -285,8 +275,59 @@ Vue.component('recipe-ingredient-adder', {
       });
     }
   },
+});
+
+Vue.component('recipe-step-remover', {
+  template: '#recipe-step-remover-template',
+  props: {
+    globalParent: Object,
+    parent: Object,
+    self: Object,
+  },
+  methods: {
+    remove: function(){
+      if(this.parent == this.self){
+        if(typeof this.self.container === 'object'){
+          var index = this.globalParent.ingredients.indexOf(this.self);
+          this.globalParent.ingredients.$set(index, this.self.container);
+        } else {
+          this.globalParent.ingredients.$remove(this.self);
+        }
+      } else {
+        this.parent.container = this.self.container;
+      }
+    }
+  },
+});
+Vue.component('recipe-quantity', {
+  template: '#recipe-quantity-template',
+  props: {
+    model: Object
+  },
+});
+
+
+
+Vue.component('recipe-step', {
+  template: '#recipe-step-template',
+  props: {
+    model: Object,
+    parent: Object
+  },
+  computed: {
+    allContainers:  function () {
+      var containers = [this.model];
+      var current_container = this.model;
+      while(typeof current_container.container === 'object'){
+        containers.unshift(current_container.container);
+        current_container = current_container.container;
+      }
+      return containers;
+    }
+  },
  });
-  
+
+
 Vue.component('recipe-root', {
   template: '#recipe-template',
   props: {
@@ -409,6 +450,11 @@ function expandRecipe(recipe){
         class="add"
         @click="addIngredient">+</button>
   </script>
+  <script type="text/x-template" id="recipe-step-remover-template">
+    <button
+        class="remove"
+        @click="remove">×</button>
+  </script>
   <script type="text/x-template" id="recipe-step-template">
     <div class="step">
       <div class="step-preparations">
@@ -428,7 +474,8 @@ function expandRecipe(recipe){
               </recipe-ingredient>
               <recipe-step
                 v-else
-                :model="ingredient">
+                :model="ingredient"
+                :parent="container">
               </recipe-step>
             </template>
           </div>
@@ -445,6 +492,7 @@ function expandRecipe(recipe){
         </div>
         <div
           v-for="container in allContainers"
+          data-ingredients="{{container.ingredients.length}}"
           class="action">
           <span
             class="description">
@@ -458,6 +506,11 @@ function expandRecipe(recipe){
           <recipe-ingredient-adder
             :parent="container">
           </recipe-ingredient-adder>
+          <recipe-step-remover
+            :self="container"
+            :parent="model"
+            :global-parent="parent">
+          </recipe-step-remover>
         </div>
       </div>
     </div>
