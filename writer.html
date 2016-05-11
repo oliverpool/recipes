@@ -173,14 +173,30 @@ input[type="number"]{
   border: none;
   background-color: red;
   color: white;
-  visibility: hidden;
+  opacity: 0;
   width: 25px;
   height: 25px;
   font-size: 1.5em;
 }
+.ingredient.-raw button.remove:hover,
 .ingredient.-raw:focus button.remove,
 .ingredient.-raw:hover button.remove{
-  visibility: inherit;
+  opacity: .9;
+}
+
+.action > button.add{
+  position: absolute;
+  top: -20px;
+  right: 0;
+  border-radius: 50%;
+  border: 1px solid black;
+  background-color: #FFF9C4;
+  opacity: 0;
+  width: 25px;
+  height: 25px;
+}
+.action:hover > button.add{
+  opacity: .7;
 }
   </style>
 
@@ -239,7 +255,35 @@ Vue.component('recipe-step', {
         current_container = current_container.container;
       }
       return containers;
-    },    
+    },
+  },
+ });
+  
+Vue.component('recipe-ingredient-adder', {
+  template: '#recipe-ingredient-adder-template',
+  props: {
+    parent: Object
+  },
+  methods: {
+    addIngredient: function(){
+      var new_ingredient = {
+        "quantity": {},
+        "of": "",
+        "select": ""
+      };
+      this.parent.ingredients.push(new_ingredient);
+
+      // Focus on first empty ingredient
+      Vue.nextTick(function(){
+        var input = document.querySelectorAll('.ingredient.-raw > h3 > input');
+        for (var i = 0, n = input.length; i < n; i = i + 1) {
+          if (!input[i].value) {
+            input[i].focus();
+            break;
+          }
+        }
+      });
+    }
   },
  });
   
@@ -275,11 +319,17 @@ function expandRecipe(recipe){
       };
     }
   }
+  addDefaultIngredients = function (step){
+    if(typeof step.ingredients === 'undefined'){
+      step.ingredients = [];
+    }
+  }
 
   addDefaultDurations(recipe);
 
   exploreStep = function(step){
     addDefaultDurations(step);
+    addDefaultIngredients(step);
     if(typeof step.container === 'object'){
       exploreStep(step.container);
     }
@@ -327,8 +377,8 @@ function expandRecipe(recipe){
   <datalist id="duration-unit">
     <option value="sec">
     <option value="min">
-    <option value="day">
-    <option value="night">
+    <option value="jour">
+    <option value="nuit">
   </datalist>
   <script type="text/x-template" id="recipe-quantity-template">
       <span class="quantity">
@@ -354,6 +404,11 @@ function expandRecipe(recipe){
       <button @click="remove" class="remove">×</button>
     </div>
   </script>
+  <script type="text/x-template" id="recipe-ingredient-adder-template">
+    <button
+        class="add"
+        @click="addIngredient">+</button>
+  </script>
   <script type="text/x-template" id="recipe-step-template">
     <div class="step">
       <div class="step-preparations">
@@ -363,11 +418,10 @@ function expandRecipe(recipe){
           v-for="container in allContainers"
           class="preparation">
           <div
-            v-if="container.ingredients"
             class="ingredients">
             <template v-for="ingredient in container.ingredients">
               <recipe-ingredient
-                v-if="ingredient.of"
+                v-if="ingredient.hasOwnProperty('of')"
                 :model="ingredient"
                 :parent="container"
                 >
@@ -401,6 +455,9 @@ function expandRecipe(recipe){
               :model="container.duration">
             </recipe-duration>
           </span>
+          <recipe-ingredient-adder
+            :parent="container">
+          </recipe-ingredient-adder>
         </div>
       </div>
     </div>
