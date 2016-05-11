@@ -180,6 +180,7 @@ button.remove{
 .ingredient.-raw button.remove{
   position: absolute;
   top: 0;
+  left: 12px;
 }
 .ingredient.-raw button.remove:hover,
 .ingredient.-raw:focus button.remove,
@@ -189,24 +190,39 @@ button.remove{
 
 .action > button.add{
   position: absolute;
-  top: -20px;
-  right: 0;
-  border-radius: 50%;
   border: 1px solid black;
-  background-color: #FFF9C4;
+  background-color: #c2e1f5;
   opacity: 0;
   width: 25px;
   height: 25px;
 }
 
+.action > button.add.-ingredient{
+  top: -20px;
+  right: 0;
+  border-radius: 50%;
+  background-color: #FFF9C4;
+}
+
+.action > button.add.-next{
+  top: 50%;
+  right: -11px;
+  margin-top:-12.5px;
+  z-index: 5;
+}
+.action > button.add.-included{
+  top: -20px;
+  right: 30px;
+}
+
 .action > button.remove{
   position: absolute;
-  bottom:0;
-  right:0;
-  visibility: hidden;
+  top:-20px;
+  left:0;
 }
 
 .action[data-ingredients='0']:hover > button.remove,
+.action[data-ingredients='0'] > button.remove:hover,
 .action:hover > button.add{
   opacity: .7;
   visibility: visible;
@@ -280,22 +296,64 @@ Vue.component('recipe-ingredient-adder', {
 Vue.component('recipe-step-remover', {
   template: '#recipe-step-remover-template',
   props: {
-    globalParent: Object,
+    relation: String,
     parent: Object,
     self: Object,
   },
   methods: {
     remove: function(){
-      if(this.parent == this.self){
-        if(typeof this.self.container === 'object'){
-          var index = this.globalParent.ingredients.indexOf(this.self);
-          this.globalParent.ingredients.$set(index, this.self.container);
-        } else {
-          this.globalParent.ingredients.$remove(this.self);
-        }
-      } else {
+      if(this.relation == 'chain'){
         this.parent.container = this.self.container;
+      } else {
+        if(typeof this.self.container === 'object'){
+          var index = this.parent.ingredients.indexOf(this.self);
+          this.parent.ingredients.$set(index, this.self.container);
+        } else {
+          this.parent.ingredients.$remove(this.self);
+        }
       }
+    }
+  },
+});
+
+Vue.component('recipe-step-adder', {
+  template: '#recipe-step-adder-template',
+  props: {
+    self: Object,
+  },
+  methods: {
+    addNext: function(){
+      var clone = JSON.parse(JSON.stringify(this.self));
+      this.self.ingredients = [];
+      this.self.duration = {};
+      this.self.description = "";
+      this.self.container = clone;
+      // Focus on first empty step
+      Vue.nextTick(function(){
+        var input = document.querySelectorAll('.action[data-ingredients="0"] em > input');
+        for (var i = 0, n = input.length; i < n; i = i + 1) {
+          if (!input[i].value) {
+            input[i].focus();
+            break;
+          }
+        }
+      });
+    },
+    addIncluded: function(){
+      this.self.ingredients.push({
+        ingredients: [],
+        duration: {}
+      });
+      // Focus on first empty step
+      Vue.nextTick(function(){
+        var input = document.querySelectorAll('.container.-raw input');
+        for (var i = 0, n = input.length; i < n; i = i + 1) {
+          if (!input[i].value) {
+            input[i].focus();
+            break;
+          }
+        }
+      });
     }
   },
 });
@@ -325,6 +383,26 @@ Vue.component('recipe-step', {
       return containers;
     }
   },
+  methods: {
+
+    addPrevious: function(container){
+      container.container = {
+        ingredients: [],
+        container: container.container,
+        duration: {}
+      }
+      // Focus on first empty step
+      Vue.nextTick(function(){
+        var input = document.querySelectorAll('.action[data-ingredients="0"] em > input');
+        for (var i = 0, n = input.length; i < n; i = i + 1) {
+          if (!input[i].value) {
+            input[i].focus();
+            break;
+          }
+        }
+      });
+    },
+  }
  });
 
 
@@ -447,13 +525,21 @@ function expandRecipe(recipe){
   </script>
   <script type="text/x-template" id="recipe-ingredient-adder-template">
     <button
-        class="add"
+        class="add -ingredient"
         @click="addIngredient">+</button>
   </script>
   <script type="text/x-template" id="recipe-step-remover-template">
     <button
         class="remove"
         @click="remove">×</button>
+  </script>
+  <script type="text/x-template" id="recipe-step-adder-template">
+    <button
+        class="add -included"
+        @click="addIncluded">+</button>
+    <button
+        class="add -next"
+        @click="addNext">+</button>
   </script>
   <script type="text/x-template" id="recipe-step-template">
     <div class="step">
@@ -489,9 +575,13 @@ function expandRecipe(recipe){
             class="container -raw">
             <input type="text" v-model="allContainers[0].container" placeholder="Récipient">
           </span>
+
+          <button
+            class="add -next"
+            @click="addPrevious(allContainers[0])">+</button>
         </div>
         <div
-          v-for="container in allContainers"
+          v-for="(index,container) in allContainers"
           data-ingredients="{{container.ingredients.length}}"
           class="action">
           <span
@@ -507,10 +597,20 @@ function expandRecipe(recipe){
             :parent="container">
           </recipe-ingredient-adder>
           <recipe-step-remover
+            v-if="index < allContainers.length -1"
             :self="container"
-            :parent="model"
-            :global-parent="parent">
+            :parent="allContainers[index+1]"
+            relation="chain">
           </recipe-step-remover>
+          <recipe-step-remover
+            v-else
+            :self="container"
+            :parent="parent"
+            relation="child">
+          </recipe-step-remover>
+          <recipe-step-adder
+            :self="container">
+          </recipe-step-adder>
         </div>
       </div>
     </div>
