@@ -1,0 +1,346 @@
+<!DOCTYPE HTML>
+
+<html><head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/vue/latest/vue.js"></script>
+    
+  
+
+<style type="text/css">
+body {
+  background-color: #fcfcfc;
+}
+
+.container.-raw{
+  font-style:italic;
+}
+
+
+.ingredients{
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+}
+
+.description{
+  font-size: 1.1em;
+  
+}
+.description em{
+  font-style:normal;
+}
+
+.quantity{
+  font-size: 1.1em;
+}
+
+.step-preparations,
+.step-actions{
+  display: table-row;
+}
+
+.preparation,
+.action{
+  display: table-cell;
+  vertical-align: bottom;
+  padding: 7px;
+}
+
+
+.step{
+  border-collapse:separate;
+  border-spacing:10px 10px;
+}
+.ingredient.-raw{
+  border: 1px solid black;
+  border-radius: 50%;
+  text-align:center;
+  padding: 1em;
+  position: relative;
+  background-color: #FFF9C4;
+  margin: 5px;
+  margin-bottom: 12px;
+}
+.ingredient.-raw:after{
+  content: "↓";
+  position: absolute;
+  bottom: -.9em;
+  left:0;
+  width: 100%;
+  font-size: 2em;
+}
+.ingredient.-raw h3{
+  margin: 0;
+}
+.action{
+  text-align: center;
+  vertical-align: middle;
+  background-color: #c2e1f5;
+  position:relative;
+}
+.action.-container{
+  background-color: #D3E9F8;
+}
+.action.-container:after{
+  border-left-color:#D3E9F8 !important;
+}
+
+.action:not(:last-of-type):after{
+    left: 100%;
+    top: 50%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-left-color: #c2e1f5;
+    border-width: 10px;
+    margin-top: -10px;
+}
+
+.action:last-of-type:before{
+  content: "↓";
+  position: absolute;
+  bottom: -.8em;
+  left:0;
+  width: 100%;
+  font-size: 2em;
+  z-index: -1;
+}
+.action:last-of-type:after{
+    left: 50%;
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-top-color: #c2e1f5;
+    border-width: 20px;
+    border-top-width: 10px;
+    margin-left: -20px;
+}
+
+.step.recipe > .step-actions > .action:last-of-type:before{
+  content: "Bon appétit !";
+  display: inline-block;
+  position:absolute;
+  bottom: initial;
+  top: 100%;
+  left:-5px;
+  margin-top: 10px;
+  word-wrap: break-word;
+  font-size: 1em;
+  background-color:#C2F5C4;
+  padding: 5px;
+  font-weight: bold;
+}
+  </style>
+
+  <title></title>
+
+  
+    
+
+
+
+
+<script type="text/javascript">//<![CDATA[
+window.onload=function(){
+Vue.config.devtools = true;
+// demo data
+var recipe = {'name': 'Meringues', 'duration': {'value':60, 'unit':'min'}, 'recipe': {'duration': {'value': 50, 'unit': 'min'}, 'container': {'ingredients': [{'ingredients': [{'of': 'sucre', 'quantity': {'value': 60, 'unit': 'g'}}], 'description': 'Mélanger le sucre avec les blancs', 'container': {'ingredients': [{'quantity': 1, 'of': 'oeuf', 'select': 'seulement le blanc'}], 'description': 'Battre les blancs en neige', 'container': 'Bol'}}], 'description': 'Faire des petits tas', 'container': 'Plaque beurrée'}, 'description': 'Mettre au four'}};
+// define the item component
+Vue.component('recipe-duration', {
+  template: '#recipe-duration-template',
+  props: {
+    model: Object
+  },
+ });
+Vue.component('recipe-ingredient', {
+  template: '#recipe-ingredient-template',
+  props: {
+    model: Object
+ },
+  computed: {
+    hasSimpleQuantity: function () {
+      return !(typeof this.model.quantity === 'object')
+    },
+  },
+});
+Vue.component('recipe-quantity', {
+  template: '#recipe-quantity-template',
+  props: {
+    model: Object
+  },
+});
+ 
+ 
+ 
+Vue.component('recipe-step', {
+  template: '#recipe-step-template',
+  props: {
+    model: Object
+  },
+  computed: {
+    allContainers:  function () {
+      var containers = [this.model];
+      var current_container = this.model.container;
+      while(typeof current_container === 'object'){
+        containers.unshift(current_container);
+        current_container = current_container.container;
+      }
+      containers.unshift(current_container);
+      
+      for(index in containers){
+        if(containers[index].ingredients){
+          containers[index].rawIngredients = containers[index].ingredients.filter(function(item){
+            return item.hasOwnProperty('of');
+          });
+          containers[index].previousIngredients = containers[index].ingredients.filter(function(item){
+            return !item.hasOwnProperty('of');
+          });
+        }
+      }      
+      return containers;
+    },
+    hasRawContainer: function () {
+      return (typeof this.model.container === 'string' || this.model.container instanceof String)
+    },
+    previousIngredients: function () {
+      return this.model.ingredients.filter(function(item){
+        return !item.hasOwnProperty('of');
+      });
+    },
+    rawIngredients: function () {
+      return this.model.ingredients.filter(function(item){
+        return item.hasOwnProperty('of');
+      });
+    },
+    
+  },
+ });
+  
+Vue.component('recipe-root', {
+  template: '#recipe-template',
+  props: {
+    model: Object
+  },
+})
+
+// boot up the demo
+var demo = new Vue({
+  el: '#demo',
+  data: {
+    recipeData: recipe
+  }
+})
+
+}//]]> 
+
+</script>
+
+  
+</head>
+
+<body>
+  <script type="text/x-template" id="recipe-template">
+    <div>
+    <h1>{{model.name}}</h1>
+    <recipe-duration
+        v-if="model.duration"
+      :model="model.duration">
+     </recipe-duration>
+    <recipe-step
+      :model="model.recipe"
+      class="recipe">
+    </recipe-step>
+  </div>
+</script>
+<script type="text/x-template" id="recipe-duration-template">
+    <div>
+    ⌛&nbsp;{{model.value}} {{model.unit}}
+  </div>
+</script>
+<script type="text/x-template" id="recipe-quantity-template">
+    <span class="quantity">
+    {{model.value}} {{model.unit}}
+  </span>
+</script>
+<script type="text/x-template" id="recipe-ingredient-template">
+    <div class="ingredient -raw">
+    <span
+      v-if="hasSimpleQuantity"
+      class="quantity">
+      {{model.quantity}}
+    </span>
+    <recipe-quantity
+      v-else
+      :model="model.quantity">
+    </recipe-quantity>
+    <h3>{{model.of}}</h3>
+    <em
+      v-if="model.select">
+        {{model.select}}
+    </em>
+  </div>
+</script>
+<script type="text/x-template" id="recipe-step-template">
+  <div class="step">
+    <div class="step-preparations">
+      <div
+        v-for="container in allContainers"
+        class="preparation">
+        <div
+          v-if="container.ingredients"
+          class="ingredients">
+          <recipe-step
+            v-for="ingredient in container.previousIngredients"
+            :model="ingredient">
+                    </recipe-step>
+          <recipe-ingredient
+            v-for="ingredient in container.rawIngredients"
+            :model="ingredient"
+            >
+          </recipe-ingredient>
+        </div>
+      </div>
+    </div>
+    <div class="step-actions">
+      <div
+        v-for="container in allContainers"
+        class="action"
+        v-bind:class="{ '-container': !container.description}">
+        <span
+          v-if="container.description"
+          class="description">
+          <em>
+          {{container.description}}
+          </em>
+          <recipe-duration
+            v-if="container.duration"
+            :model="container.duration">
+          </recipe-duration>
+        </span>
+        <span
+          v-else
+          class="container -raw">
+          {{container}}
+        </span>
+      </div>
+    </div>
+  </div>
+</script>
+
+<!-- the demo root element -->
+<div id="demo">
+  <recipe-root
+    :model="recipeData">
+  </recipe-root>
+</div>
+
+</body></html>
