@@ -431,7 +431,8 @@ Vue.component('recipe-step-adder', {
     addIncluded: function(){
       this.self.ingredients.push({
         ingredients: [],
-        duration: {}
+        duration: {},
+        container: ""
       });
       // Focus on first empty step
       Vue.nextTick(function(){
