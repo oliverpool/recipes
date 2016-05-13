@@ -227,7 +227,7 @@ button.remove{
   opacity: .7;
   visibility: visible;
 }
-.step.recipe > .step-actions > .action:last-of-type button.remove{
+.step.recipe > .step-actions > .action.-container ~ .action:nth-of-type(2):last-of-type > button.remove{
   display: none;
 }
   </style>
@@ -394,7 +394,11 @@ Vue.component('recipe-step-remover', {
       if(this.relation == 'chain'){
         this.parent.container = this.self.container;
       } else {
-        if(typeof this.self.container === 'object'){
+        if(this.parent.hasOwnProperty('recipe')){
+          if(typeof this.self.container === 'object'){
+            this.parent.recipe = this.self.container;
+          }
+        } else if(typeof this.self.container === 'object'){
           var index = this.parent.ingredients.indexOf(this.self);
           this.parent.ingredients.$set(index, this.self.container);
         } else {
@@ -570,6 +574,7 @@ function expandRecipe(recipe){
        </recipe-duration>
       <recipe-step
         :model="model.recipe"
+        :parent="model"
         class="recipe">
       </recipe-step>
       <pre>
