@@ -238,6 +238,8 @@ button.remove{
   .url{
     white-space:nowrap;
     overflow:hidden;
+    display:block;
+    text-overflow: ellipsis;
   }
   </style>
 
@@ -640,7 +642,7 @@ function expandRecipe(recipe){
         class="recipe">
       </recipe-step>
       <button @click="share">Partager/Sauvegarder</button><br>
-      <div class="url -reader" id="reader_url">{{reader_url}}</div>
+      <a class="url -reader" id="reader_url" href="{{reader_url}}">{{reader_url}}</a>
       <pre>
 {{model | json}}
       </pre>
