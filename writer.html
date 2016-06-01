@@ -243,12 +243,16 @@ button.remove{
   display: none;
 }
   
-  .url{
+  .url.-reader{
     white-space:nowrap;
     overflow:hidden;
     display:block;
     text-overflow: ellipsis;
   }
+  .url.-reader em{
+    color:gray;
+  }
+  
   </style>
 
   <title></title>
@@ -667,6 +671,10 @@ function reduceRecipe(recipe){
   <script type="text/x-template" id="recipe-template">
     <div>
       <h1><input type="text" v-model="model.name" placeholder="Nom de la recette" required=""></h1>
+      <span class="url -reader" ><span @click="share">Lien de partage</span> :
+      <a v-if="reader_url" id="reader_url" href="{{reader_url}}">{{reader_url}}</a>
+      <em v-else>Génération en cours...</em>
+      </span><br>
       <recipe-duration
         :model="model.duration">
        </recipe-duration>
@@ -675,9 +683,6 @@ function reduceRecipe(recipe){
         :parent="model"
         class="recipe">
       </recipe-step>
-      <button @click="share">Partager/Sauvegarder</button><br>
-      <span v-if="reader_url">Voici le lien pour partager cette recette:<br></span>
-      <a class="url -reader" id="reader_url" href="{{reader_url}}">{{reader_url}}</a>
       <pre>
 {{model | json}}
       </pre>
