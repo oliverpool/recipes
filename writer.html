@@ -5,6 +5,7 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="googlebot" content="noindex, nofollow">
   <script type="text/javascript" src="https://cdn.jsdelivr.net/vue/latest/vue.js"></script>
+  <script type="text/javascript" src="vendor/js/pako.min.js"></script>
     
   
 
@@ -505,6 +506,11 @@ Vue.component('recipe-root', {
   props: {
     model: Object
   },
+  methods: {
+
+    save: function(){
+      alert('ras');
+    }
 })
 
 expandRecipe(recipe);
@@ -560,6 +566,19 @@ function expandRecipe(recipe){
 }
 
 
+/*
+var binaryString = pako.deflate(JSON.stringify(test), { to: 'string' });
+
+//
+// Here you can do base64 encode, make xhr requests and so on.
+//
+
+var restored = JSON.parse(pako.inflate(binaryString, { to: 'string' }));
+
+console.log('ras');
+console.log(btoa(binaryString).length);
+*/
+
 </script>
 
   
@@ -577,6 +596,7 @@ function expandRecipe(recipe){
         :parent="model"
         class="recipe">
       </recipe-step>
+      <button @click="share">Partager</button>
       <pre>
 {{model | json}}
       </pre>
