@@ -525,6 +525,19 @@ Vue.component('recipe-root', {
     model: Object,
     reader_url: String
   },
+  watch:{
+    model: {
+      handler: function (val, oldVal) {
+        this.reader_url = "";
+        if(hashTimer){
+          clearTimeout(hashTimer);
+        }
+        hashTimer = window.setTimeout(this.share, 1000);
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   methods: {
     share: function(){
       var recipe_copy = JSON.parse(JSON.stringify(this.model));
@@ -533,9 +546,11 @@ Vue.component('recipe-root', {
       //var full_url = url_root + '#' + hash;
       location.hash = '#' + hash;
       this.reader_url = url_root + '#' + hash;
-    },
-  }
-})
+    }
+  },
+});
+  
+var hashTimer = null;
 
 
 
