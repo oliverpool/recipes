@@ -521,7 +521,8 @@ Vue.component('recipe-root', {
     share: function(){
       var hash = json_to_hash(this.model);
       var url_root = 'https://oliverpool.github.io/recipes/reader.html';
-      var full_url = url_root + '#' + hash;
+      //var full_url = url_root + '#' + hash;
+      location.hash = '#' + hash;
       this.reader_url = url_root + '#' + hash;
       Vue.nextTick(this.select_url);
     },
