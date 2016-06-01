@@ -234,6 +234,11 @@ button.remove{
 .step.recipe > .step-actions > .action.-container ~ .action:nth-of-type(2):last-of-type > button.remove{
   display: none;
 }
+  
+  .url{
+    white-space:nowrap;
+    overflow:hidden;
+  }
   </style>
 
   <title></title>
@@ -507,15 +512,30 @@ Vue.component('recipe-step', {
 Vue.component('recipe-root', {
   template: '#recipe-template',
   props: {
-    model: Object
+    model: Object,
+    reader_url: String
   },
   methods: {
     share: function(){
       var hash = json_to_hash(this.model);
       var url_root = 'https://oliverpool.github.io/recipes/reader.html';
       var full_url = url_root + '#' + hash;
-      console.log(full_url);
+      this.reader_url = url_root + '#' + hash;
+      Vue.nextTick(this.select_url);
     },
+    select_url: function(){
+        var node = document.getElementById('reader_url');
+        if ( document.selection ) {
+            var range = document.body.createTextRange();
+            range.moveToElementText( node  );
+            range.select();
+        } else if ( window.getSelection ) {
+            var range = document.createRange();
+            range.selectNodeContents( node );
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange( range );
+        }
+    }
   }
 })
 
@@ -602,18 +622,6 @@ function expandRecipe(recipe){
 
 }
 
-
-/*
-//
-// Here you can do base64 encode, make xhr requests and so on.
-//
-
-var restored = JSON.parse(pako.inflate(binaryString, { to: 'string' }));
-
-console.log('ras');
-console.log(btoa(binaryString).length);
-*/
-
 </script>
 
   
@@ -631,7 +639,8 @@ console.log(btoa(binaryString).length);
         :parent="model"
         class="recipe">
       </recipe-step>
-      <button @click="share">Partager</button>
+      <button @click="share">Partager/Sauvegarder</button><br>
+      <div class="url -reader" id="reader_url">{{reader_url}}</div>
       <pre>
 {{model | json}}
       </pre>
