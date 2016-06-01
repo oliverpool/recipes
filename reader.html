@@ -312,7 +312,8 @@ Vue.component('recipe-step', {
 Vue.component('recipe-root', {
   template: '#recipe-template',
   props: {
-    model: Object
+    model: Object,
+    hash: String
   },
 })
 
@@ -345,11 +346,15 @@ if(recipe === false){
   recipe = default_recipe;
 }
 
+var hash = json_to_hash(recipe);
+location.hash = '#' + hash;
+
 // boot up the demo
 var demo = new Vue({
   el: '#demo',
   data: {
-    recipeData: recipe
+    recipeData: recipe,
+    hash: hash
   }
 })
 
@@ -364,6 +369,7 @@ var demo = new Vue({
   <script type="text/x-template" id="recipe-template">
     <div>
     <h1>{{model.name}}</h1>
+    <a href="./writer.html#{{hash}}">Éditer la recette</a>
     <recipe-duration
         v-if="model.duration"
       :model="model.duration">
@@ -452,7 +458,8 @@ var demo = new Vue({
 <!-- the demo root element -->
 <div id="demo">
   <recipe-root
-    :model="recipeData">
+    :model="recipeData"
+    :hash="hash">
   </recipe-root>
 </div>
 
