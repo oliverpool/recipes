@@ -527,26 +527,13 @@ Vue.component('recipe-root', {
   },
   methods: {
     share: function(){
-      var hash = json_to_hash(this.model);
+      var recipe_copy = JSON.parse(JSON.stringify(this.model));
+      var hash = json_to_hash(reduceRecipe(recipe_copy));
       var url_root = 'https://oliverpool.github.io/recipes/reader.html';
       //var full_url = url_root + '#' + hash;
       location.hash = '#' + hash;
       this.reader_url = url_root + '#' + hash;
-      Vue.nextTick(this.select_url);
     },
-    select_url: function(){
-        var node = document.getElementById('reader_url');
-        if ( document.selection ) {
-            var range = document.body.createTextRange();
-            range.moveToElementText( node  );
-            range.select();
-        } else if ( window.getSelection ) {
-            var range = document.createRange();
-            range.selectNodeContents( node );
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange( range );
-        }
-    }
   }
 })
 
@@ -630,7 +617,30 @@ function expandRecipe(recipe){
   }
   exploreStep(recipe.recipe);
   return recipe;
+}
+  
+function reduceRecipe(recipe){
+  removeDefaultDurations = function (step){
+    if(!step.duration.value || step.duration.value == "0"){
+      delete step.duration;
+    }
+  }
 
+  removeDefaultDurations(recipe);
+
+  exploreStep = function(step){
+    removeDefaultDurations(step);
+    if(typeof step.container === 'object'){
+      exploreStep(step.container);
+    }
+    for(index in step.ingredients){
+      if(!step.ingredients[index].hasOwnProperty('of')){
+        exploreStep(step.ingredients[index]);
+      }
+    }
+  }
+  exploreStep(recipe.recipe);
+  return recipe;
 }
 
 </script>
@@ -651,6 +661,7 @@ function expandRecipe(recipe){
         class="recipe">
       </recipe-step>
       <button @click="share">Partager/Sauvegarder</button><br>
+      <span v-if="reader_url">Voici le lien pour partager cette recette:<br></span>
       <a class="url -reader" id="reader_url" href="{{reader_url}}">{{reader_url}}</a>
       <pre>
 {{model | json}}
