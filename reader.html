@@ -194,33 +194,26 @@ Vue.component('recipe-step', {
         current_container = current_container.container;
       }
       containers.unshift(current_container);
-      
-      for(index in containers){
-        if(containers[index].ingredients){
-          containers[index].rawIngredients = containers[index].ingredients.filter(function(item){
-            return item.hasOwnProperty('of');
-          });
-          containers[index].previousIngredients = containers[index].ingredients.filter(function(item){
-            return !item.hasOwnProperty('of');
-          });
-        }
-      }      
       return containers;
     },
     hasRawContainer: function () {
       return (typeof this.model.container === 'string' || this.model.container instanceof String)
     },
-    previousIngredients: function () {
-      return this.model.ingredients.filter(function(item){
-        return !item.hasOwnProperty('of');
-      });
+  },
+  methods:{
+    hasDescription: function(container){
+      return (typeof container.description == 'string');
     },
-    rawIngredients: function () {
-      return this.model.ingredients.filter(function(item){
+    rawIngredients: function (container) {
+      return container.ingredients.filter(function(item){
         return item.hasOwnProperty('of');
       });
     },
-    
+    previousIngredients: function (container) {
+      return container.ingredients.filter(function(item){
+        return !item.hasOwnProperty('of');
+      });
+    },    
   },
  });
 
@@ -288,7 +281,7 @@ window.onhashchange = function(){
 
   <div>
     <h1>{{model.name}}</h1>
-    <a href="./writer.html#{{hash}}">Éditer la recette</a>
+    <a href="./contenteditable.html#{{hash}}">Éditer la recette</a>
     <recipe-duration
         v-if="model.duration"
       :model="model.duration">
@@ -305,7 +298,7 @@ window.onhashchange = function(){
   </div>
 </script>
 <script type="text/x-template" id="recipe-quantity-template">
-    <span class="quantity">
+  <span class="quantity">
     {{model.value}} {{model.unit}}
   </span>
 </script>
@@ -337,11 +330,11 @@ window.onhashchange = function(){
           v-if="container.ingredients"
           class="ingredients">
           <recipe-step
-            v-for="ingredient in container.previousIngredients"
+            v-for="ingredient in previousIngredients(container)"
             :model="ingredient">
                     </recipe-step>
           <recipe-ingredient
-            v-for="ingredient in container.rawIngredients"
+            v-for="ingredient in rawIngredients(container)"
             :model="ingredient"
             >
           </recipe-ingredient>
