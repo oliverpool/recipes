@@ -155,7 +155,6 @@ body {
 <script type="text/javascript">//<![CDATA[
 window.onload=function(){
 Vue.config.devtools = true;
-// define the item component
 Vue.component('recipe-duration', {
   template: '#recipe-duration-template',
   props: {
@@ -225,34 +224,43 @@ Vue.component('recipe-step', {
     
   },
  });
+
+function loadFromHash(){
+  var recipe = hashConvertor.toJSON(location.hash.substr(1));
+  if(recipe === false){
+    if(location.hash.substr(1)){
+      alert('Erreur lors du chargement de la recette : chargement d\'une recette aléatoire');
+    }
+    recipe = recipeStore.random();
+    location.hash = '#' + hashConvertor.fromJSON(recipe);
+  }
+  return recipe;
+}
   
 Vue.component('recipe-root', {
   template: '#recipe-template',
   props: {
     model: {
       type: Object,
-      default: function(){
-        var recipe = hashConvertor.toJSON(location.hash.substr(1));
-        if(recipe === false){
-          if(location.hash.substr(1)){
-            alert('Erreur lors de la lecture de la recette : chargement d\'une recette aléatoire');
-          }
-          recipe = recipeStore.random();
-          location.hash = '#' + hashConvertor.fromJSON(recipe);
-        }
-        return recipe;
-      }
+      default: loadFromHash,
     },
   },
   computed:{
     hash: function(){
       return hashConvertor.fromJSON(this.model);
+    },
+    list: function(){
+      return recipeStore.list;
     }
   }
 })
 
 // boot up Vue
 var vm = new Vue({el: '#recipe'});
+
+window.onhashchange = function(){
+  vm.$children[0].model = loadFromHash();
+}
 
 }//]]> 
 
@@ -262,8 +270,6 @@ var vm = new Vue({el: '#recipe'});
 </head>
 
 <body>
-
-<a href="./reader.html">Recette aléatoire</a>
 <div id="recipe">
   <recipe-root>
   </recipe-root>
@@ -271,6 +277,15 @@ var vm = new Vue({el: '#recipe'});
 
 
 <script type="text/x-template" id="recipe-template">
+  <ul>
+    <li v-for="(name, hash) of list">
+      <a href="./reader.html#{{hash}}">{{name}}</a>
+    </li>
+    <li>
+      [<a href="./reader.html">Recette aléatoire</a>]
+    </li>
+  </ul>
+
   <div>
     <h1>{{model.name}}</h1>
     <a href="./writer.html#{{hash}}">Éditer la recette</a>
