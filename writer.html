@@ -226,6 +226,15 @@ button.remove{
   top: -20px;
   right: 30px;
 }
+.action > button.add.-below{
+  bottom: -20px;
+  left: 50%;
+  margin-left:-12.5px;
+  z-index: 5;
+}
+.step-actions > .action:not(:last-of-type) > button.add.-below{
+  display: none;
+}
 
 .action > button.remove{
   position: absolute;
@@ -438,6 +447,23 @@ Vue.component('recipe-step-adder', {
     self: Object,
   },
   methods: {
+    addBelow: function(){
+      var clone = JSON.parse(JSON.stringify(this.self));
+      this.self.duration = {};
+      this.self.description = "";
+      this.self.container = "";
+      this.self.ingredients = [clone];
+      // Focus on first empty step
+      Vue.nextTick(function(){
+        var input = document.querySelectorAll('.container.-raw input');
+        for (var i = 0, n = input.length; i < n; i = i + 1) {
+          if (!input[i].value) {
+            input[i].focus();
+            break;
+          }
+        }
+      });
+    },
     addNext: function(){
       var clone = JSON.parse(JSON.stringify(this.self));
       this.self.ingredients = [];
@@ -741,6 +767,9 @@ function reduceRecipe(recipe){
     <button
         class="add -next"
         @click="addNext">+</button>
+    <button
+        class="add -below"
+        @click="addBelow">+</button>
   </script>
   <script type="text/x-template" id="recipe-step-template">
     <div class="step">
