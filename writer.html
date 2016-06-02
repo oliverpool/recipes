@@ -553,12 +553,23 @@ Vue.component('recipe-root', {
   template: '#recipe-template',
   props: {
     model: Object,
-    reader_url: String
+    hash: String
+  },
+  computed:{
+    reader_url: function() {
+      if(this.hash){
+        var url = window.location.href;
+        url = url.substring(0, url.indexOf('/writer.html'));
+        return url + '/reader.html#' + this.hash;
+      } else {
+        return "";
+      }
+    }
   },
   watch:{
     model: {
       handler: function (val, oldVal) {
-        this.reader_url = "";
+        this.hash = "";
         if(hashTimer){
           clearTimeout(hashTimer);
         }
@@ -572,10 +583,8 @@ Vue.component('recipe-root', {
     share: function(){
       var recipe_copy = JSON.parse(JSON.stringify(this.model));
       var hash = json_to_hash(reduceRecipe(recipe_copy));
-      var url_root = 'https://oliverpool.github.io/recipes/reader.html';
-      //var full_url = url_root + '#' + hash;
       location.hash = '#' + hash;
-      this.reader_url = url_root + '#' + hash;
+      this.hash = hash;
     }
   },
 });
@@ -606,10 +615,35 @@ function hash_to_json(hash){
     return false;
   }
 }
-  
+
+var recipeManager = (function(){
+  var stack = [];
+  return {
+    push: function(obj) {
+      stack.push(obj);
+    },
+    pop: function() {
+      return stack.pop();
+    },
+    new: function(){
+      return {
+        "name": "",
+        "duration": {},
+        "recipe": {
+          "duration": {},
+          "container": "",
+          "description": "",
+          "ingredients": []
+        }
+      };
+    }
+  }
+})();
+
 var recipe = hash_to_json(location.hash.substr(1));
 if(recipe === false){
   recipe = default_recipe;
+  recipe = recipeManager.new();
 }
 
 
