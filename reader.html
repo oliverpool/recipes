@@ -233,6 +233,7 @@ function loadFromHash(){
     recipe = recipeStore.random();
     location.hash = '#' + hashConvertor.fromJSON(recipe);
   }
+  document.title = recipe.name + " - Recette de cuisine";
   return recipe;
 }
   
