@@ -1,0 +1,706 @@
+<!DOCTYPE HTML>
+
+<html><head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <script type="text/javascript" src="vendor/js/pako.min.js"></script>
+  <script type="text/javascript" src="vendor/js/vue.js"></script>
+  <script type="text/javascript" src="recipes.js"></script>
+    
+  
+
+<style type="text/css">
+body {
+  background-color: #f0fff0;
+}
+
+.container.-raw{
+  font-style:italic;
+}
+
+
+.ingredients{
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+}
+
+.description{
+  font-size: 1.1em;
+  
+}
+.description em{
+  font-style:normal;
+}
+
+.quantity{
+  font-size: 1.1em;
+}
+
+.step-preparations,
+.step-actions{
+  display: table-row;
+}
+
+.preparation,
+.action{
+  display: table-cell;
+  vertical-align: bottom;
+  padding: 7px;
+}
+
+
+.step{
+  border-collapse:separate;
+  border-spacing:10px 10px;
+}
+.ingredient.-raw{
+  border: 1px solid black;
+  border-radius: 50%;
+  text-align:center;
+  padding: 1em;
+  position: relative;
+  background-color: #FFF9C4;
+  margin: 5px;
+  margin-bottom: 12px;
+}
+.ingredient.-raw:after{
+  content: "↓";
+  position: absolute;
+  bottom: -.9em;
+  left:0;
+  width: 100%;
+  font-size: 2em;
+}
+.ingredient.-raw h3{
+  margin: 0;
+}
+.action{
+  text-align: center;
+  vertical-align: middle;
+  background-color: #c2e1f5;
+  position:relative;
+}
+.action.-container{
+  background-color: #D3E9F8;
+}
+.action.-container:after{
+  border-left-color:#D3E9F8 !important;
+}
+
+.action:not(:last-of-type):after{
+    left: 100%;
+    top: 50%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-left-color: #c2e1f5;
+    border-width: 10px;
+    margin-top: -10px;
+}
+
+.action:last-of-type:before{
+  content: "↓";
+  position: absolute;
+  bottom: -.8em;
+  left:0;
+  width: 100%;
+  font-size: 2em;
+  z-index: -1;
+}
+.action:last-of-type:after{
+    left: 50%;
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-top-color: #c2e1f5;
+    border-width: 20px;
+    border-top-width: 10px;
+    margin-left: -20px;
+}
+
+.step.recipe > .step-actions > .action:last-of-type:before{
+  content: "Bon appétit !";
+  display: inline-block;
+  position:absolute;
+  bottom: initial;
+  top: 100%;
+  left:-5px;
+  margin-top: 10px;
+  word-wrap: break-word;
+  font-size: 1em;
+  background-color:#C2F5C4;
+  padding: 5px;
+  font-weight: bold;
+}
+
+input{
+  background-color: transparent;
+  border: 1px solid transparent;
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  font-style: inherit;
+  text-align: inherit;
+}
+input:hover,
+input:focus{
+  background-color: rgba(255,255,255,.5);
+  border-color: #555;
+}
+
+input[type="number"]{
+  width: 3.5em;
+  text-align: right;
+}
+.quantity{
+  white-space: nowrap;
+}
+.editable:empty{
+  width: 1px;
+  display: inline-block;
+  position: relative;
+}
+.editable:empty:before{
+  content: "*placeholder*";
+  position: absolute;
+  left: -50px;
+  right: -50px;
+  text-align: center;
+  white-space: nowrap;
+  color: #888;
+}
+.container.-raw .editable:empty:before{
+  content: "Récipient";
+}
+.container.-raw .editable:empty{
+  margin-left: 1.5em;
+  margin-right: 1.5em;  
+}
+.description .editable:empty:before{
+  content: "Description";
+}
+.description .editable:empty{
+  margin-left: 2em;
+  margin-right: 2em;  
+}
+.ingredient h3 .editable:empty:before{
+  content: "Ingrédient";
+}
+.ingredient h3 .editable:empty{
+  margin-left: 2em;
+  margin-right: 2em;
+}
+.ingredient em .editable:empty:before{
+  content: "Extrait";
+}
+.hovergroup .-hideable .editable:empty,
+.hovergroup div.-empty{
+  display: none;
+}
+.hovergroup.-focus .editable:empty{
+  display: inline-block;
+}
+/* Duration */
+.hovergroup.-focus div.-empty{
+  display: block;
+}
+
+.quantity.-editable{
+  display: none;
+}
+.hovergroup.-focus .quantity.-editable{
+  display: inline;
+}
+.hovergroup.-focus .quantity.-editable + .quantity{
+  display: none;
+}
+.url.-reader{
+  white-space:nowrap;
+  overflow:hidden;
+  display:block;
+  text-overflow: ellipsis;
+}
+.url.-reader em{
+  color:gray;
+}
+
+  </style>
+
+  <title></title>
+
+  
+    
+
+
+
+
+<script type="text/javascript">//<![CDATA[
+window.onload=function(){
+
+var FOCUSOUT_DELAY = 5;
+
+Vue.config.devtools = true;
+Vue.component('recipe-duration', {
+  template: '#recipe-duration-template',
+  props: {
+    model: Object
+  },
+  methods: {
+    focusout: function(e){
+      var hg = this.hovergroup;
+      hg.dataset.timer = setTimeout(function(){
+        hg.classList.remove('-focus');
+      }, FOCUSOUT_DELAY);
+    },
+    focusin: function(e){
+      if(!this.hovergroup){
+        var hovergroup = e.target;
+        while(!hovergroup.classList.contains('hovergroup')){
+          hovergroup = hovergroup.parentNode;
+        }
+        this.hovergroup = hovergroup;
+      }
+      if(this.hovergroup.dataset.timer){
+        clearTimeout(this.hovergroup.dataset.timer);
+      }
+      this.hovergroup.classList.add('-focus');
+    }
+  }
+ });
+Vue.component('recipe-ingredient', {
+  template: '#recipe-ingredient-template',
+  props: {
+    model: Object
+ },
+  computed: {
+    hasSimpleQuantity: function () {
+      return !(typeof this.model.quantity === 'object')
+    },
+  },
+});
+Vue.component('recipe-quantity', {
+  template: '#recipe-quantity-template',
+  props: {
+    model: Object
+  },
+  methods: {
+    focusout: function(e){
+      var hg = this.hovergroup;
+      hg.dataset.timer = setTimeout(function(){
+        hg.classList.remove('-focus');
+      }, FOCUSOUT_DELAY);
+    },
+    focusin: function(e){
+      if(!this.hovergroup){
+        var hovergroup = e.target;
+        while(!hovergroup.classList.contains('hovergroup')){
+          hovergroup = hovergroup.parentNode;
+        }
+        this.hovergroup = hovergroup;
+      }
+      if(this.hovergroup.dataset.timer){
+        clearTimeout(this.hovergroup.dataset.timer);
+      }
+      this.hovergroup.classList.add('-focus');
+
+      // Focus on actual input
+      if(e.target.tagName == 'SPAN'){
+        e.target.previousSibling.firstChild.focus();
+      }
+    }
+  }
+});
+ 
+ 
+ 
+Vue.component('recipe-step', {
+  template: '#recipe-step-template',
+  props: {
+    model: Object
+  },
+  computed: {
+    allContainers:  function () {
+      var containers = [this.model];
+      var current_container = this.model.container;
+      while(typeof current_container === 'object'){
+        containers.unshift(current_container);
+        current_container = current_container.container;
+      }
+      containers.unshift(current_container);
+      return containers;
+    },
+    hasRawContainer: function () {
+      return (typeof this.model.container === 'string' || this.model.container instanceof String)
+    },
+  },
+  methods:{
+    hasDescription: function(container){
+      return (typeof container.description == 'string');
+    },
+    rawIngredients: function (container) {
+      return container.ingredients.filter(function(item){
+        return item.hasOwnProperty('of');
+      });
+    },
+    previousIngredients: function (container) {
+      return container.ingredients.filter(function(item){
+        return !item.hasOwnProperty('of');
+      });
+    },    
+  },
+ });
+
+function loadFromHash(){
+  var recipe = hashConvertor.toJSON(location.hash.substr(1));
+  if(recipe === false){
+    if(location.hash.substr(1)){
+      alert('Erreur lors du chargement de la recette : chargement d\'une recette aléatoire');
+    }
+    recipe = recipeStore.random();
+    //location.hash = '#' + hashConvertor.fromJSON(recipe);
+  }
+  document.title = recipe.name + " - Recette de cuisine";
+  expandRecipe(recipe);
+  return recipe;
+}
+  
+Vue.component('recipe-root', {
+  template: '#recipe-template',
+  props: {
+    model: {
+      type: Object,
+      default: loadFromHash,
+    },
+    hash: String
+  },
+  computed:{
+    list: function(){
+      return recipeStore.list;
+    },
+    reader_url: function() {
+      if(this.hash){
+        var url = window.location.href;
+        url = url.substring(0, url.indexOf('/contenteditable.html'));
+        return url + '/reader.html#' + this.hash;
+      } else {
+        return "";
+      }
+    }
+  },
+  watch:{
+    model: {
+      handler: function (val, oldVal) {
+        this.hash = "";
+        if(hashTimer){
+          clearTimeout(hashTimer);
+        }
+        hashTimer = window.setTimeout(this.share, 1000);
+      },
+      deep: true,
+      immediate: true
+    }
+  },
+  methods: {
+    share: function(){
+      var recipe_copy = JSON.parse(JSON.stringify(this.model));
+      var hash = hashConvertor.fromJSON(reduceRecipe(recipe_copy));
+
+      window.onhashchange = function(){};
+      location.hash = '#' + hash;
+      // prevent infinite loop
+      setTimeout(function(){
+        window.onhashchange = function(){
+          vm.$children[0].model = loadFromHash();
+        }
+      }, 100);
+      this.hash = hash;
+    }
+  },
+});
+var hashTimer = null;
+  
+Vue.component('edit-text', {
+  template: '#edit-text',
+  props: {
+    field: String
+  },
+  methods: {
+    clean: function(e){
+      var raw  = e.target.innerText.replace(/(\r\n|\n|\r)/gm," ");
+      this.field = raw;
+      return raw;
+    },
+    update: function(e){
+      e.target.innerText = this.clean(e);
+      var hg = this.hovergroup;
+      hg.dataset.timer = setTimeout(function(){
+        hg.classList.remove('-focus');
+      }, FOCUSOUT_DELAY);
+    },
+    prepare: function(e){
+      if(!this.hovergroup){
+        var hovergroup = e.target;
+        while(!hovergroup.classList.contains('hovergroup')){
+          hovergroup = hovergroup.parentNode;
+        }
+        this.hovergroup = hovergroup;
+      }
+      if(this.hovergroup.dataset.timer){
+        clearTimeout(this.hovergroup.dataset.timer);
+      }
+      this.hovergroup.classList.add('-focus');
+    }
+  }
+});
+
+// boot up Vue
+var vm = new Vue({el: '#recipe'});
+t = vm;
+
+window.onhashchange = function(){
+  vm.$children[0].model = loadFromHash();
+}
+
+}//]]> 
+
+
+function expandRecipe(recipe){
+  addDefaultDurations = function (step){
+    if(!step.hasOwnProperty('duration')){
+      step.duration = {};
+    }
+  }
+  addDefaultQuantity = function (ingredient){
+    if(typeof ingredient.quantity !== 'object'){
+      ingredient.quantity = {
+        'value':ingredient.quantity
+      };
+    }
+  }
+  addDefaultIngredients = function (step){
+    if(typeof step.ingredients === 'undefined'){
+      step.ingredients = [];
+    }
+  }
+
+  addDefaultDurations(recipe);
+
+  exploreStep = function(step){
+    addDefaultDurations(step);
+    addDefaultIngredients(step);
+    if(typeof step.container === 'object'){
+      exploreStep(step.container);
+    }
+    for(index in step.ingredients){
+      if(!step.ingredients[index].hasOwnProperty('of')){
+        exploreStep(step.ingredients[index]);
+      } else {
+        addDefaultQuantity(step.ingredients[index]);
+      }
+    }
+  }
+  exploreStep(recipe.recipe);
+  return recipe;
+}
+  
+function reduceRecipe(recipe){
+  removeDefaultDurations = function (step){
+    if(!step.duration.value || step.duration.value == "0"){
+      delete step.duration;
+    } else if(!step.duration.unit || step.duration.unit.length == 0){
+      delete step.duration.unit;
+    }
+  }
+
+  removeDefaultDurations(recipe);
+
+  exploreStep = function(step){
+    removeDefaultDurations(step);
+    if(typeof step.container === 'object'){
+      exploreStep(step.container);
+    }
+    if(!step.ingredients.length){
+      delete step.ingredients;
+    } else {
+      for(index in step.ingredients){
+        if(!step.ingredients[index].hasOwnProperty('of')){
+          exploreStep(step.ingredients[index]);
+        } else {
+          var ingredient = step.ingredients[index];
+          if(!ingredient.quantity.unit || !ingredient.quantity.unit.length){
+            ingredient.quantity = ingredient.quantity.value;
+          }
+        }
+      }
+    }
+  }
+  exploreStep(recipe.recipe);
+  return recipe;
+}
+
+</script>
+
+  
+</head>
+
+<body>
+<div id="recipe">
+  <recipe-root>
+  </recipe-root>
+</div>
+
+<script type="text/x-template" id="edit-text">
+  <span contenteditable="true" @focusout="update" @input="clean" @focusin="prepare" class="editable">{{field}}</span>
+</script>
+
+<script type="text/x-template" id="recipe-template">
+  <ul>
+    <li v-for="(name, hash) of list">
+      <a href="./contenteditable.html#{{hash}}">{{name}}</a>
+    </li>
+    <li>
+      [<a href="./contenteditable.html">Recette aléatoire</a>]
+    </li>
+  </ul>
+  <div>
+    <div class="hovergroup">
+      <h1><edit-text :field.sync="model.name"></edit-text></h1>
+      <span class="url -reader" ><span @click="share">Lien de partage</span> :
+      <a v-if="reader_url" id="reader_url" href="{{reader_url}}">{{reader_url}}</a>
+      <em v-else>Génération en cours...</em>
+      </span>
+      <recipe-duration
+        :model="model.duration">
+      </recipe-duration>
+   </div>
+    <recipe-step
+      :model="model.recipe"
+      class="recipe">
+    </recipe-step>
+  </div>
+</script>
+<script type="text/x-template" id="recipe-duration-template">
+  <div
+    v-bind:class="{ '-empty': !model.value || (model.value.length == 0) || model.value == '0'}"
+  >
+  ⌛&nbsp;<input
+    type="number"
+    v-model="model.value"
+    placeholder="Durée"
+    step="any"
+    min="0"
+    @focusin="focusin"
+    @focusout="focusout"
+    ><input
+    type="text"
+    v-model="model.unit"
+    placeholder="Unité"
+    list="duration-unit"
+    size="5"
+    @focusin="focusin"
+    @focusout="focusout" >
+  </div>
+</script>
+<datalist id="duration-unit">
+  <option value="sec">
+  <option value="min">
+  <option value="jour">
+  <option value="nuit">
+</datalist>
+<script type="text/x-template" id="recipe-quantity-template">
+  <span
+    v-bind:class="{ 
+    'quantity': true,
+    '-editable': true,
+    '-empty': !model.value || !model.value.length || model.value == '0'}"
+    ><input
+      type="number"
+      v-model="model.value"
+      placeholder="Quantité"
+      step="any"
+      min="0"
+      @focusin="focusin"
+      @focusout="focusout"><input
+      type="text"
+      v-model="model.unit"
+      placeholder="Unité"
+      list="quantity-unit"
+      size="5"
+      @focusin="focusin"
+      @focusout="focusout">
+  </span><span class="quantity" @click="focusin">
+    {{model.value}} {{model.unit}}
+  </span>
+</script>
+<datalist id="quantity-unit">
+  <option value="g">
+  <option value="kg">
+  <option value="mL">
+  <option value="L">
+</datalist>
+<script type="text/x-template" id="recipe-ingredient-template">
+    <div class="ingredient -raw hovergroup">
+    <recipe-quantity :model="model.quantity">
+    </recipe-quantity>
+    <h3><edit-text :field.sync="model.of"></edit-text></h3>
+    <em class="-hideable">
+        <edit-text :field.sync="model.select"></edit-text>
+    </em>
+  </div>
+</script>
+<script type="text/x-template" id="recipe-step-template">
+  <div class="step">
+    <div class="step-preparations">
+      <div
+        v-for="container in allContainers"
+        class="preparation">
+        <div
+          v-if="container.ingredients"
+          class="ingredients">
+          <recipe-step
+            v-for="ingredient in previousIngredients(container)"
+            :model="ingredient">
+                    </recipe-step>
+          <recipe-ingredient
+            v-for="ingredient in rawIngredients(container)"
+            :model="ingredient"
+            >
+          </recipe-ingredient>
+        </div>
+      </div>
+    </div>
+    <div class="step-actions">
+      <div
+        v-for="container in allContainers"
+        class="action"
+        v-bind:class="{ '-container': !hasDescription(container)}">
+        <span
+          v-if="hasDescription(container)"
+          class="description hovergroup">
+          <em>
+          <edit-text :field.sync="container.description"></edit-text>
+          </em>
+          <recipe-duration
+            v-if="container.duration"
+            :model="container.duration">
+          </recipe-duration>
+        </span>
+        <span
+          v-else
+          class="container -raw hovergroup">
+          <edit-text :field.sync="container"></edit-text>
+        </span>
+      </div>
+    </div>
+  </div>
+</script>
+</body></html>
