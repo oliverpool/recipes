@@ -267,6 +267,14 @@ window.onload=function(){
 
 var FOCUSOUT_DELAY = 5000;
 
+function findHovergroup(initialElement){
+  var hovergroup = initialElement;
+  while(!hovergroup.classList.contains('hovergroup')){
+    hovergroup = hovergroup.parentNode;
+  }
+  return hovergroup;
+}
+
 function setFocusOn(hovergroup) {
   var elems = document.getElementsByClassName('-focus');
   var hasFocus = false;
@@ -297,11 +305,7 @@ Vue.component('recipe-duration', {
     },
     focusin: function(e){
       if(!this.hovergroup){
-        var hovergroup = e.target;
-        while(!hovergroup.classList.contains('hovergroup')){
-          hovergroup = hovergroup.parentNode;
-        }
-        this.hovergroup = hovergroup;
+        this.hovergroup = findHovergroup(e.target);
       }
       if(this.hovergroup.dataset.timer){
         clearTimeout(this.hovergroup.dataset.timer);
@@ -335,11 +339,7 @@ Vue.component('recipe-quantity', {
     },
     focusin: function(e){
       if(!this.hovergroup){
-        var hovergroup = e.target;
-        while(!hovergroup.classList.contains('hovergroup')){
-          hovergroup = hovergroup.parentNode;
-        }
-        this.hovergroup = hovergroup;
+        this.hovergroup = findHovergroup(e.target);
       }
       if(this.hovergroup.dataset.timer){
         clearTimeout(this.hovergroup.dataset.timer);
@@ -491,11 +491,7 @@ Vue.component('edit-text', {
         e.target.innerText = "";
       }
       if(!this.hovergroup){
-        var hovergroup = e.target;
-        while(!hovergroup.classList.contains('hovergroup')){
-          hovergroup = hovergroup.parentNode;
-        }
-        this.hovergroup = hovergroup;
+        this.hovergroup = findHovergroup(e.target);
       }
       if(this.hovergroup.dataset.timer){
         clearTimeout(this.hovergroup.dataset.timer);
