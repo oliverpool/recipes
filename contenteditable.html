@@ -529,7 +529,8 @@ confirmLeave = function() {
 
 function expandRecipe(recipe){
   addDefaultDurations = function (step){
-    if(!step.hasOwnProperty('duration')){
+    if(!step.hasOwnProperty('duration') || !step.duration){
+      console.log(step.duration);
       step.duration = {};
     }
   }
@@ -630,11 +631,11 @@ function reduceRecipe(recipe){
   </ul>
   <div>
     <div class="hovergroup header">
-      <h1><edit-text :field.sync="model.name"></edit-text></h1>
       <span class="url -reader" ><span @click="share">Lien de partage</span> :
       <a v-if="reader_url" id="reader_url" href="{{reader_url}}">{{reader_url}}</a>
       <em v-else>Génération en cours...</em>
       </span>
+      <h1><edit-text :field.sync="model.name"></edit-text></h1>
       <recipe-duration
         :model="model.duration">
       </recipe-duration>

@@ -283,8 +283,8 @@ window.onhashchange = function(){
   </ul>
 
   <div>
-    <h1>{{model.name}}</h1>
     <a href="./contenteditable.html#{{hash}}">Éditer la recette</a>
+    <h1>{{model.name}}</h1>
     <recipe-duration
         v-if="model.duration"
       :model="model.duration">
