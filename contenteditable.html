@@ -386,7 +386,12 @@ Vue.component('recipe-step', {
  });
 
 function loadFromHash(){
-  var recipe = hashConvertor.toJSON(location.hash.substr(1));
+  var recipe = false;
+  if(location.hash.substr(1) == "empty"){
+    recipe = recipeStore.empty();
+  } else {
+    recipe = hashConvertor.toJSON(location.hash.substr(1));
+  }
   if(recipe === false){
     if(location.hash.substr(1)){
       alert('Erreur lors du chargement de la recette : chargement d\'une recette aléatoire');
@@ -608,6 +613,9 @@ function reduceRecipe(recipe){
   <ul>
     <li v-for="(name, hash) of list">
       <a href="./contenteditable.html#{{hash}}">{{name}}</a>
+    </li>
+    <li>
+      [<a href="./contenteditable.html#empty" >Nouvelle recette</a>]
     </li>
     <li>
       [<a href="./contenteditable.html" onclick="return confirmLeave()">Recette aléatoire</a>]

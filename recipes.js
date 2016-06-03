@@ -146,6 +146,23 @@ var recipeStore = function(){
     random: function(){
       return recipes[Math.floor(Math.random() * recipes.length)];
     },
+    empty: function(){
+      return {
+        "name":"",
+        "duration":"",
+        "recipe":{
+          "container":"",
+          "description":"",
+          "ingredients":[
+            {
+              "quantity":{},
+              "of":"",
+              "select":""
+            }
+          ]
+        }
+      }
+    },
     list: {
       'Meringues':'pako-eJx9kDFuwzAMRa8icPbQDu3gMUO3AN2LDozybQiQKUcSAxSBD5Rz5GKlnSFobHQk+T//Iy8kPIBa2iMH6RWFGjpq5hqSUHuhM0e1+ftLQyqhmnIIQlNDGT6MmCUb8reV3CepHAR5VllSxjFAaqH2a12nzoxFfYbRnJSlhvqzTdPTNH0bMorPYbxj0P52jSw9sotwyx7HZ3irijvYxM9X/kv0CH1t7jgJ2pmrIMLPwQUaMZhhzliW0hpkx7Va+CPXQZwg9PgLQLsUtw754GB267kRhlNc5Sd0+ox8UiOA5ny7Yv710zOwMLC6Lmm2lF90t61t',
       'Cake aux raisins':'pako-eJylU71OwzAQfhXrFpYMgARDRioxUSEViQV1cN1Le+DY4WwjUJV3YaTPkRfDbtqK4PInpsjK93ff2SswskYoYSQfUMjwLFiSI+OggHlg6ckaKFfwJHWIsPPjAoIhHwk1GWgLYFTUYIIcgJ9lcGWNl2SQE4rMgnFOaLyD8u7ns62i0KTPJxyqFNKhRpUMovoOsQz18M/04DBwAvt4JsTPMB/cIjOmHtAppqZnw1X0d8hCo9t1JdwR1TOaRVay+nbGxyCNJ//yRY7GbmJs5hhx91ajqKKLWmI26x+ULiXHPP9RuAmKfydwuudcY6hctoiPDV9YnfU77tZamsW24VRft972137GTuS9DX64jMxkbING0b2KdMUzu7jkfpvCR6ncYozec3oZorKBI3240GnbvgO1zxp5',      
