@@ -372,9 +372,6 @@ Vue.component('recipe-step', {
       containers.unshift(current_container);
       return containers;
     },
-    hasRawContainer: function () {
-      return (typeof this.model.container === 'string' || this.model.container instanceof String)
-    },
   },
   methods:{
     hasDescription: function(container){

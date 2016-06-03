@@ -196,9 +196,6 @@ Vue.component('recipe-step', {
       containers.unshift(current_container);
       return containers;
     },
-    hasRawContainer: function () {
-      return (typeof this.model.container === 'string' || this.model.container instanceof String)
-    },
   },
   methods:{
     hasDescription: function(container){
@@ -348,9 +345,9 @@ window.onhashchange = function(){
       <div
         v-for="container in allContainers"
         class="action"
-        v-bind:class="{ '-container': !container.description}">
+        v-bind:class="{ '-container': !hasDescription(container)}">
         <span
-          v-if="container.description"
+          v-if="hasDescription(container)"
           class="description">
           <em>
           {{container.description}}
