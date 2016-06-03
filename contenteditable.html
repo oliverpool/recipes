@@ -233,6 +233,10 @@ input[type="number"]{
   color:gray;
 }
 
+.ingredient.-focus{
+  border-color:red;
+}
+
   </style>
 
   <title></title>
@@ -433,6 +437,14 @@ Vue.component('edit-text', {
   props: {
     field: String
   },
+  computed:{
+    original_field:function(){
+      if(typeof this._field == 'undefined'){
+        this._field = this.field;
+      }
+      return this._field;
+    }
+  },
   methods: {
     clean: function(e){
       var raw  = e.target.innerText.replace(/(\r\n|\n|\r)/gm," ");
@@ -559,7 +571,7 @@ function reduceRecipe(recipe){
 </div>
 
 <script type="text/x-template" id="edit-text">
-  <span contenteditable="true" @focusout="update" @input="clean" @focusin="prepare" class="editable">{{field}}</span>
+  <span contenteditable="true" @focusout="update" @input="clean" @focusin="prepare" class="editable">{{original_field}}</span>
 </script>
 
 <script type="text/x-template" id="recipe-template">
