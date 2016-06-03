@@ -186,34 +186,35 @@ input[type="number"]{
 }
 h1 .editable:empty:before{
   content: "Titre de la recette";
+  left:0;
+  right: 0;
 }
 h1 .editable:empty{
-  margin-left: 50px;
-  margin-right: 50px;  
+  padding-right: 8em;
 }
 .container.-raw .editable:empty:before{
   content: "Récipient";
 }
 .container.-raw .editable:empty{
-  margin-left: 1.5em;
-  margin-right: 1.5em;  
+  padding:0 2em;
 }
 .description .editable:empty:before{
   content: "Description";
 }
 .description .editable:empty{
-  margin-left: 2em;
-  margin-right: 2em;  
+  padding:0 2.5em;
 }
 .ingredient h3 .editable:empty:before{
   content: "Ingrédient";
 }
 .ingredient h3 .editable:empty{
-  margin-left: 2em;
-  margin-right: 2em;
+  padding:0 2.5em;
 }
 .ingredient em .editable:empty:before{
   content: "Extrait";
+}
+.ingredient em .editable:empty{
+  padding:0 1.5em;
 }
 .hovergroup .-hideable .editable:empty,
 .hovergroup div.-empty{
@@ -471,14 +472,6 @@ Vue.component('edit-text', {
   props: {
     field: String
   },
-  computed:{
-    original_field:function(){
-      if(typeof this._field == 'undefined'){
-        this._field = this.field;
-      }
-      return this._field;
-    }
-  },
   methods: {
     clean: function(e){
       var raw  = e.target.innerText.replace(/(\r\n|\n|\r)/gm," ");
@@ -493,6 +486,10 @@ Vue.component('edit-text', {
       }, FOCUSOUT_DELAY);
     },
     prepare: function(e){
+      if(!this.field.length){
+        // prevent bug when initially empty
+        e.target.innerText = "";
+      }
       if(!this.hovergroup){
         var hovergroup = e.target;
         while(!hovergroup.classList.contains('hovergroup')){
@@ -514,7 +511,8 @@ t = vm;
 
 window.onhashchange = function(){
   if(confirm('Attention, les modifications actuelles vont être perdues!')){
-    vm.$children[0].model = loadFromHash();
+    var newRecipe = loadFromHash();
+    vm.$children[0].model = newRecipe;
   } else {
     vm.$children[0].share();
   }
@@ -530,7 +528,6 @@ confirmLeave = function() {
 function expandRecipe(recipe){
   addDefaultDurations = function (step){
     if(!step.hasOwnProperty('duration') || !step.duration){
-      console.log(step.duration);
       step.duration = {};
     }
   }
@@ -614,7 +611,7 @@ function reduceRecipe(recipe){
 </div>
 
 <script type="text/x-template" id="edit-text">
-  <span contenteditable="true" @focusout="update" @input="clean" @focusin="prepare" class="editable">{{original_field}}</span>
+  <span contenteditable="true" @focusout="update" @input="clean" @focusin="prepare" class="editable">{{field}}</span>
 </script>
 
 <script type="text/x-template" id="recipe-template">
