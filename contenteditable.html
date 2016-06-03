@@ -233,8 +233,9 @@ input[type="number"]{
   color:gray;
 }
 
-.ingredient.-focus{
-  border-color:red;
+.hovergroup.-focus{
+  border-color:rgba(0,100,0,1);
+  box-shadow: 0 0 15px rgba(0,0,100,1);
 }
 
   </style>
@@ -250,7 +251,22 @@ input[type="number"]{
 <script type="text/javascript">//<![CDATA[
 window.onload=function(){
 
-var FOCUSOUT_DELAY = 5;
+var FOCUSOUT_DELAY = 0;
+
+function setFocusOn(hovergroup) {
+  var elems = document.getElementsByClassName('-focus');
+  var hasFocus = false;
+  for (var i = elems.length - 1; i >= 0; i--) {
+    if(elems[i] == hovergroup){
+      hasFocus = true;
+    } else {
+      elems[i].classList.remove('-focus');
+    }
+  }
+  if(!hasFocus){
+    hovergroup.classList.add('-focus');
+  }
+}
 
 Vue.config.devtools = true;
 Vue.component('recipe-duration', {
@@ -276,7 +292,7 @@ Vue.component('recipe-duration', {
       if(this.hovergroup.dataset.timer){
         clearTimeout(this.hovergroup.dataset.timer);
       }
-      this.hovergroup.classList.add('-focus');
+      setFocusOn(this.hovergroup);
     }
   }
  });
@@ -314,7 +330,7 @@ Vue.component('recipe-quantity', {
       if(this.hovergroup.dataset.timer){
         clearTimeout(this.hovergroup.dataset.timer);
       }
-      this.hovergroup.classList.add('-focus');
+      setFocusOn(this.hovergroup);
 
       // Focus on actual input
       if(e.target.tagName == 'SPAN'){
@@ -469,7 +485,7 @@ Vue.component('edit-text', {
       if(this.hovergroup.dataset.timer){
         clearTimeout(this.hovergroup.dataset.timer);
       }
-      this.hovergroup.classList.add('-focus');
+      setFocusOn(this.hovergroup);
     }
   }
 });
@@ -693,11 +709,11 @@ function reduceRecipe(recipe){
     <div class="step-actions">
       <div
         v-for="container in allContainers"
-        class="action"
+        class="action hovergroup"
         v-bind:class="{ '-container': !hasDescription(container)}">
         <span
           v-if="hasDescription(container)"
-          class="description hovergroup">
+          class="description">
           <em>
           <edit-text :field.sync="container.description"></edit-text>
           </em>
@@ -708,7 +724,7 @@ function reduceRecipe(recipe){
         </span>
         <span
           v-else
-          class="container -raw hovergroup">
+          class="container -raw">
           <edit-text :field.sync="container"></edit-text>
         </span>
       </div>
