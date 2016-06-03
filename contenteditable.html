@@ -440,13 +440,13 @@ Vue.component('recipe-root', {
       var recipe_copy = JSON.parse(JSON.stringify(this.model));
       var hash = hashConvertor.fromJSON(reduceRecipe(recipe_copy));
 
+      var oldHashChange = window.onhashchange;
+
       window.onhashchange = function(){};
       location.hash = '#' + hash;
       // prevent infinite loop
       setTimeout(function(){
-        window.onhashchange = function(){
-          vm.$children[0].model = loadFromHash();
-        }
+        window.onhashchange = oldHashChange;
       }, 100);
       this.hash = hash;
     }
@@ -501,7 +501,15 @@ var vm = new Vue({el: '#recipe'});
 t = vm;
 
 window.onhashchange = function(){
-  vm.$children[0].model = loadFromHash();
+  if(confirm('Attention, les modifications actuelles vont être perdues!')){
+    vm.$children[0].model = loadFromHash();
+  } else {
+    vm.$children[0].share();
+  }
+}
+
+confirmLeave = function() {
+  return confirm("Cela va supprimer vos changements!");
 }
 
 }//]]> 
@@ -602,7 +610,7 @@ function reduceRecipe(recipe){
       <a href="./contenteditable.html#{{hash}}">{{name}}</a>
     </li>
     <li>
-      [<a href="./contenteditable.html">Recette aléatoire</a>]
+      [<a href="./contenteditable.html" onclick="return confirmLeave()">Recette aléatoire</a>]
     </li>
   </ul>
   <div>
