@@ -142,15 +142,21 @@ body {
   font-weight: bold;
 }
 
+.editable,
 input{
+  display: inline-block;
   background-color: transparent;
   border: 1px solid transparent;
+  margin: -1px;
   font-size: inherit;
   font-weight: inherit;
   font-family: inherit;
   font-style: inherit;
   text-align: inherit;
 }
+.quantity:hover,
+.editable:hover,
+.editable:focus,
 input:hover,
 input:focus{
   background-color: rgba(255,255,255,.5);
@@ -233,7 +239,7 @@ input[type="number"]{
   color:gray;
 }
 
-.hovergroup.-focus{
+.hovergroup.-focus:not(.header){
   border-color:rgba(0,100,0,1);
   box-shadow: 0 0 15px rgba(0,0,100,1);
 }
@@ -251,7 +257,7 @@ input[type="number"]{
 <script type="text/javascript">//<![CDATA[
 window.onload=function(){
 
-var FOCUSOUT_DELAY = 0;
+var FOCUSOUT_DELAY = 5000;
 
 function setFocusOn(hovergroup) {
   var elems = document.getElementsByClassName('-focus');
@@ -600,7 +606,7 @@ function reduceRecipe(recipe){
     </li>
   </ul>
   <div>
-    <div class="hovergroup">
+    <div class="hovergroup header">
       <h1><edit-text :field.sync="model.name"></edit-text></h1>
       <span class="url -reader" ><span @click="share">Lien de partage</span> :
       <a v-if="reader_url" id="reader_url" href="{{reader_url}}">{{reader_url}}</a>
