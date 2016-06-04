@@ -569,7 +569,10 @@ function reduceRecipe(recipe){
     <em class="-hideable">
       <edit-text :field.sync="model.select"></edit-text>
     </em>
-    <button @click="remove" class="remove">×</button>
+    <button
+      @click="remove"
+      class="remove"
+      title="Supprimer cet ingrédient">×</button>
   </div>
 </script>
 <script type="text/x-template" id="recipe-step-template">
@@ -617,23 +620,30 @@ function reduceRecipe(recipe){
           <edit-text :field.sync="container"></edit-text>
         </span>
         <template v-if="isRemovable(container)">
-          <button @click="remove(container)" class="remove">×</button>
+          <button
+            @click="remove(container)"
+            class="remove"
+            title="Supprimer cette étape">×</button>
         </template>
         <button
           class="add -after"
-          @click="addStepAfter(container)">+</button>
+          @click="addStepAfter(container)"
+          title="Ajouter une étape juste après">+</button>
         <template v-if="isLastStep(container)">
           <button
             class="add -below"
-            @click="addStepBelow(container)">+</button>
+            @click="addStepBelow(container)"
+            title="Verser dans un nouveau récipient">+</button>
         </template>
         <template v-if="hasDescription(container)">
           <button
             class="add -raw-ingredient"
-            @click="addIngredient(container, true)">+</button>
+            @click="addIngredient(container, true)"
+            title="Ajouter un ingrédient">+</button>
           <button
             class="add -step-ingredient"
-            @click="addIngredient(container, false)">+</button>
+            @click="addIngredient(container, false)"
+            title="Ajouter une étape">+</button>
         </template>
       </div>
     </div>
