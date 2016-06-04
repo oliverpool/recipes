@@ -42,12 +42,9 @@ function setFocusOn(hovergroup) {
 // Set the user focus on a field for next Tick
 function userFocus(classname){
   Vue.nextTick(function(){
-    var input = document.querySelectorAll(classname);
-    for (var i = 0, n = input.length; i < n; i = i + 1) {
-      if (!input[i].value) {
-        input[i].focus();
-        break;
-      }
+    var input = document.querySelector(classname);
+    if(input){
+      input.focus();
     }
   });
 }
@@ -141,7 +138,6 @@ Vue.component('recipe-step', {
         containers.unshift(current_container);
         current_container = current_container.container;
       }
-      containers.unshift(current_container);
       return containers;
     },
   },
@@ -167,41 +163,67 @@ Vue.component('recipe-step', {
       if(!this.hasDescription(container)){
         return false;
       }
-      // No ingredients and not the "global root alone".
-      if(!container.ingredients.length &&
-          (this.parent || !this.isLastStep(container) || this.hasDescription(container.container)) ){
-        return true;
+
+      // Somewhere in the chain
+      if(!this.isLastStep(container)){
+        return container.ingredients.length == 0;
       }
-      // Followed by a raw container, last in chanin and not at root
-      if(!this.hasDescription(container.container) && this.isLastStep(container) && this.parent){
-        return true;
+      // Last in the chain
+
+      // Not root
+      if(this.parent){
+        return container.ingredients.length == 0 || !this.hasDescription(container.container);
       }
-      return false;
+
+      // No ingredients
+      if(container.ingredients.length == 0){
+        return this.hasDescription(container.container);
+      }
+
+      // One ingredient: a step
+      return this.rawIngredients(container).length == 0 && container.ingredients.length == 1;
     },
     remove: function (container){
-      if(this.isLastStep(container)){
-        // first in the chain
-        if(!this.parent){
-          // recipe root
-          this.model = container.container;
-        } else if(this.hasDescription(container.container)){
-          // replace with the next one in chain
-          var idx = this.parent.ingredients.indexOf(container);
-          this.parent.ingredients.$set(idx, container.container);
-        } else {
-          // Transfer ingredients
-          var ingredients = container.ingredients;
-          Array.prototype.push.apply(this.parent.ingredients, ingredients);
-          this.parent.ingredients.$remove(container);
-        }
-      } else {
+      if(!this.isRemovable(container)){
+        alert('Not allowed!');
+        return;
+      }
+      // Somewhere in the chain
+      if(!this.isLastStep(container)){
         // find the parentContainer
         var parent = this.model;
         while(parent.container != container){
           parent = parent.container;
         }
         parent.container = container.container;
+        return;
       }
+      // Last in the chain
+
+      // Not root
+      if(this.parent){
+        if(!this.hasDescription(container.container)){
+          // Transfer ingredients
+          var ingredients = container.ingredients;
+          Array.prototype.push.apply(this.parent.ingredients, ingredients);
+          this.parent.ingredients.$remove(container);
+        } else if(container.ingredients.length == 0){
+          // Transfer container
+          this.model = container.container;
+        }
+        return;
+      }
+
+      // No ingredients
+      if(container.ingredients.length == 0){
+        if(this.hasDescription(container.container)){
+          this.model = container.container;
+        }
+        return;
+      }
+
+      // One step-ingredient
+      this.model = container.ingredients[0];
     },
     // Adders
     addStepAfter: function(container){
@@ -350,7 +372,7 @@ Vue.component('edit-text', {
     },
     prepare: function(e){
       if(!this.field.length){
-        // prevent bug when initially empty
+        // prevent bug when initially empty of repeated strings
         e.target.innerText = "";
       }
       if(!this.hovergroup){
@@ -579,6 +601,9 @@ function reduceRecipe(recipe){
 <script type="text/x-template" id="recipe-step-template">
   <div class="step">
     <div class="step-preparations">
+      <div class="preparation">
+        <!--For the raw-container-->
+      </div>
       <div
         v-for="container in allContainers"
         class="preparation">
@@ -600,13 +625,20 @@ function reduceRecipe(recipe){
       </div>
     </div>
     <div class="step-actions">
+      <div class="action hovergroup -container">
+        <span
+          class="container -raw">
+          <edit-text :field.sync="allContainers[0].container"></edit-text>
+        </span>
+        <button
+          class="add -after"
+          @click="addStepAfter(allContainers[0].container)"
+          title="Ajouter une étape juste après">+</button>
+      </div>
       <div
         v-for="container in allContainers"
-        class="action hovergroup"
-        v-bind:class="{ '-container': !hasDescription(container)}">
-        <span
-          v-if="hasDescription(container)"
-          class="description">
+        class="action hovergroup">
+        <span class="description">
           <em>
             <edit-text :field.sync="container.description"></edit-text>
           </em>
@@ -615,11 +647,6 @@ function reduceRecipe(recipe){
             :model="container.duration">
           </recipe-duration>
         </span>
-        <span
-          v-else
-          class="container -raw">
-          <edit-text :field.sync="container"></edit-text>
-        </span>
         <template v-if="isRemovable(container)">
           <button
             @click="remove(container)"
@@ -627,16 +654,14 @@ function reduceRecipe(recipe){
             tabindex="-1"
             title="Supprimer cette étape">×</button>
         </template>
-        <template v-if="hasDescription(container)">
-          <button
-            class="add -step-ingredient"
-            @click="addIngredient(container, false)"
-            title="Ajouter une étape">+</button>
-          <button
-            class="add -raw-ingredient"
-            @click="addIngredient(container, true)"
-            title="Ajouter un ingrédient">+</button>
-        </template>
+        <button
+          class="add -step-ingredient"
+          @click="addIngredient(container, false)"
+          title="Ajouter une étape">+</button>
+        <button
+          class="add -raw-ingredient"
+          @click="addIngredient(container, true)"
+          title="Ajouter un ingrédient">+</button>
         <button
           class="add -after"
           @click="addStepAfter(container)"
