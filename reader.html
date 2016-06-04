@@ -7,143 +7,8 @@
   <script type="text/javascript" src="vendor/js/pako.min.js"></script>
   <script type="text/javascript" src="vendor/js/vue.js"></script>
   <script type="text/javascript" src="recipes.js"></script>
-    
-  
-
-<style type="text/css">
-body {
-  background-color: #fcfcfc;
-}
-
-.container.-raw{
-  font-style:italic;
-}
-
-
-.ingredients{
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-around;
-}
-
-.description{
-  font-size: 1.1em;
-  
-}
-.description em{
-  font-style:normal;
-}
-
-.quantity{
-  font-size: 1.1em;
-}
-
-.step-preparations,
-.step-actions{
-  display: table-row;
-}
-
-.preparation,
-.action{
-  display: table-cell;
-  vertical-align: bottom;
-  padding: 7px;
-}
-
-
-.step{
-  border-collapse:separate;
-  border-spacing:10px 10px;
-}
-.ingredient.-raw{
-  border: 1px solid black;
-  border-radius: 50%;
-  text-align:center;
-  padding: 1em;
-  position: relative;
-  background-color: #FFF9C4;
-  margin: 5px;
-  margin-bottom: 12px;
-}
-.ingredient.-raw:after{
-  content: "↓";
-  position: absolute;
-  bottom: -.9em;
-  left:0;
-  width: 100%;
-  font-size: 2em;
-}
-.ingredient.-raw h3{
-  margin: 0;
-}
-.action{
-  text-align: center;
-  vertical-align: middle;
-  background-color: #c2e1f5;
-  position:relative;
-}
-.action.-container{
-  background-color: #D3E9F8;
-}
-.action.-container:after{
-  border-left-color:#D3E9F8 !important;
-}
-
-.action:not(:last-of-type):after{
-    left: 100%;
-    top: 50%;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none;
-    border-left-color: #c2e1f5;
-    border-width: 10px;
-    margin-top: -10px;
-}
-
-.action:last-of-type:before{
-  content: "↓";
-  position: absolute;
-  bottom: -.8em;
-  left:0;
-  width: 100%;
-  font-size: 2em;
-  z-index: -1;
-}
-.action:last-of-type:after{
-    left: 50%;
-    top: 100%;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none;
-    border-top-color: #c2e1f5;
-    border-width: 20px;
-    border-top-width: 10px;
-    margin-left: -20px;
-}
-
-.step.recipe > .step-actions > .action:last-of-type:before{
-  content: "Bon appétit !";
-  display: inline-block;
-  position:absolute;
-  bottom: initial;
-  top: 100%;
-  left:-5px;
-  margin-top: 10px;
-  word-wrap: break-word;
-  font-size: 1em;
-  background-color:#C2F5C4;
-  padding: 5px;
-  font-weight: bold;
-}
-  </style>
-
-  <title></title>
+  <link rel="stylesheet" type="text/css" href="reader.css">
+  <title>Afficher une recette de cuisine</title>
 
   
     
@@ -281,7 +146,7 @@ window.onhashchange = function(){
 
   <div>
     <a href="./contenteditable.html#{{hash}}">Éditer la recette</a>
-    <a href="./writer.html#{{hash}}">(éditeur 2)</a>
+    <a href="./writer.html#{{hash}}">(ancien éditeur)</a>
     <h1>{{model.name}}</h1>
     <recipe-duration
         v-if="model.duration"
