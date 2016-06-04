@@ -227,16 +227,17 @@ Vue.component('recipe-step', {
     },
     // Adders
     addStepAfter: function(container){
-      if(typeof container =='object'){
-        var clone = JSON.parse(JSON.stringify(container));
-        container.ingredients = [];
-        container.duration = {};
-        container.description = "";
-        container.container = clone;
+      if(container == this.model){
+        this.model = {
+          'ingredients': [],
+          'duration': {},
+          'description': "",
+          'container': container,
+        }
       } else {
         // find the parentContainer
         var parent = this.model;
-        while(typeof parent.container == 'object'){
+        while(parent.container != container){
           parent = parent.container;
         }
         parent.container = {
@@ -244,7 +245,7 @@ Vue.component('recipe-step', {
           'duration': {},
           'description': "",
           'container': container,
-        };
+        }
       }
       userFocus('.description span[contenteditable="true"]:empty');
     },
