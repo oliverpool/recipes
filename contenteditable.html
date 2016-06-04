@@ -252,6 +252,36 @@ h1 .editable:empty{
   box-shadow: 0 0 15px rgba(0,0,100,1);
 }
 
+
+/* Removal */
+button.remove{
+  border-radius: 50%;
+  border: none;
+  color: red;
+  background-color: rgba(100,100,100,0.2);
+  opacity: 1;
+  width: 25px;
+  height: 25px;
+  font-size: 1.5em;
+  display: none;
+}
+.hovergroup.-focus:not(.header) button.remove{
+  display: block;
+}
+button.remove:hover{
+  background-color: red;
+  color: white;
+}
+.action > button.remove{
+  position: absolute;
+  top:-20px;
+  left:0;
+}
+.ingredient.-raw button.remove{
+  position: absolute;
+  top: -10px;
+  left: 12px;
+}
   </style>
 
   <title></title>
