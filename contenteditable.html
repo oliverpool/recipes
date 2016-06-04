@@ -317,12 +317,18 @@ Vue.component('recipe-duration', {
 Vue.component('recipe-ingredient', {
   template: '#recipe-ingredient-template',
   props: {
-    model: Object
+    model: Object,
+    parent: Object
  },
   computed: {
     hasSimpleQuantity: function () {
       return !(typeof this.model.quantity === 'object')
     },
+  },
+  methods: {
+    remove: function (event){
+      this.parent.ingredients.$remove(this.model);
+    }
   },
 });
 Vue.component('recipe-quantity', {
@@ -359,7 +365,11 @@ Vue.component('recipe-quantity', {
 Vue.component('recipe-step', {
   template: '#recipe-step-template',
   props: {
-    model: Object
+    model: Object,
+    parent:{
+      type: Object,
+      default: null
+    }
   },
   computed: {
     allContainers:  function () {
@@ -386,7 +396,35 @@ Vue.component('recipe-step', {
       return container.ingredients.filter(function(item){
         return !item.hasOwnProperty('of');
       });
-    },    
+    },
+    isRemovable: function (container){
+      return this.hasDescription(container) &&
+        !container.ingredients.length &&
+        (this.parent || container != this.model || this.hasDescription(container.container));
+    },
+    remove: function (container){
+      if(container == this.model){
+        // first in the chain
+        if(!this.parent){
+          // recipe root
+          this.model = container.container;
+        } else if(this.hasDescription(container.container)){
+          // replace with the next one in chain
+          var idx = this.parent.ingredients.indexOf(container);
+          this.parent.ingredients.$set(idx, container.container);
+        } else {
+          // completely removed
+          this.parent.ingredients.$remove(container);
+        }
+      } else {
+        // find the parentContainer
+        var parent = this.model;
+        while(parent.container != container){
+          parent = parent.container;
+        }
+        parent.container = container.container;
+      }
+    },
   },
  });
 
@@ -632,7 +670,7 @@ function reduceRecipe(recipe){
       </recipe-duration>
    </div>
     <recipe-step
-      :model="model.recipe"
+      :model.sync="model.recipe"
       class="recipe">
     </recipe-step>
   </div>
@@ -697,13 +735,14 @@ function reduceRecipe(recipe){
   <option value="L">
 </datalist>
 <script type="text/x-template" id="recipe-ingredient-template">
-    <div class="ingredient -raw hovergroup">
+  <div class="ingredient -raw hovergroup">
     <recipe-quantity :model="model.quantity">
     </recipe-quantity>
     <h3><edit-text :field.sync="model.of"></edit-text></h3>
     <em class="-hideable">
-        <edit-text :field.sync="model.select"></edit-text>
+      <edit-text :field.sync="model.select"></edit-text>
     </em>
+    <button @click="remove" class="remove">×</button>
   </div>
 </script>
 <script type="text/x-template" id="recipe-step-template">
@@ -717,11 +756,13 @@ function reduceRecipe(recipe){
           class="ingredients">
           <recipe-step
             v-for="ingredient in previousIngredients(container)"
-            :model="ingredient">
-                    </recipe-step>
+            :model="ingredient"
+            :parent="container">
+          </recipe-step>
           <recipe-ingredient
             v-for="ingredient in rawIngredients(container)"
             :model="ingredient"
+            :parent="container"
             >
           </recipe-ingredient>
         </div>
@@ -736,7 +777,7 @@ function reduceRecipe(recipe){
           v-if="hasDescription(container)"
           class="description">
           <em>
-          <edit-text :field.sync="container.description"></edit-text>
+            <edit-text :field.sync="container.description"></edit-text>
           </em>
           <recipe-duration
             v-if="container.duration"
@@ -748,6 +789,9 @@ function reduceRecipe(recipe){
           class="container -raw">
           <edit-text :field.sync="container"></edit-text>
         </span>
+        <template v-if="isRemovable(container)">
+          <button @click="remove(container)" class="remove">×</button>
+        </template>
       </div>
     </div>
   </div>
