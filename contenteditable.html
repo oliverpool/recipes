@@ -320,6 +320,19 @@ function setFocusOn(hovergroup) {
   }
 }
 
+// Set the user focus on a field for next Tick
+function userFocus(classname){
+  Vue.nextTick(function(){
+    var input = document.querySelectorAll(classname);
+    for (var i = 0, n = input.length; i < n; i = i + 1) {
+      if (!input[i].value) {
+        input[i].focus();
+        break;
+      }
+    }
+  });
+}
+
 Vue.config.devtools = true;
 Vue.component('recipe-duration', {
   template: '#recipe-duration-template',
@@ -471,6 +484,55 @@ Vue.component('recipe-step', {
         parent.container = container.container;
       }
     },
+    // Adders
+    addStepAfter: function(container){
+      if(typeof container =='object'){
+        var clone = JSON.parse(JSON.stringify(container));
+        container.ingredients = [];
+        container.duration = {};
+        container.description = "";
+        container.container = clone;
+      } else {
+        // find the parentContainer
+        var parent = this.model;
+        while(typeof parent.container == 'object'){
+          parent = parent.container;
+        }
+        parent.container = {
+          'ingredients': [],
+          'duration': {},
+          'description': "",
+          'container': container,
+        };
+      }
+      userFocus('.description span[contenteditable="true"]:empty');
+    },
+    addStepBelow: function(container){
+      var clone = JSON.parse(JSON.stringify(container));
+      container.duration = {};
+      container.description = "";
+      container.container = "";
+      container.ingredients = [clone];
+      userFocus('.container.-raw span[contenteditable="true"]:empty');
+    },
+    addIngredient: function(container, raw){
+      if(raw){
+        container.ingredients.push({
+          "quantity": {},
+          "of": "",
+          "select": "",
+        });
+        userFocus('h3 span[contenteditable="true"]:empty');
+      } else {
+        container.ingredients.push({
+          ingredients: [],
+          duration: {},
+          description: "",
+          container: "",
+        });
+        userFocus('.container.-raw span[contenteditable="true"]:empty');
+      }
+    }
   },
  });
 
@@ -837,6 +899,22 @@ function reduceRecipe(recipe){
         </span>
         <template v-if="isRemovable(container)">
           <button @click="remove(container)" class="remove">×</button>
+        </template>
+        <button
+          class="add -after"
+          @click="addStepAfter(container)">+</button>
+        <template v-if="isLastStep(container)">
+          <button
+            class="add -below"
+            @click="addStepBelow(container)">+</button>
+        </template>
+        <template v-if="hasDescription(container)">
+          <button
+            class="add -raw-ingredient"
+            @click="addIngredient(container, true)">+</button>
+          <button
+            class="add -step-ingredient"
+            @click="addIngredient(container, false)">+</button>
         </template>
       </div>
     </div>
