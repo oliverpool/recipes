@@ -454,6 +454,7 @@ Vue.component('recipe-root', {
 
       window.onhashchange = function(){};
       location.hash = '#' + hash;
+      document.title = this.model.name + " - Recette de cuisine";
       // prevent infinite loop
       setTimeout(function(){
         window.onhashchange = oldHashChange;
