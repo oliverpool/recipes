@@ -180,16 +180,14 @@ input[type="number"]{
 .editable:empty:before{
   content: "*placeholder*";
   position: absolute;
-  left: -50px;
-  right: -50px;
+  left: 0;
+  right: 0;
   text-align: center;
   white-space: nowrap;
   color: #888;
 }
 h1 .editable:empty:before{
   content: "Titre de la recette";
-  left:0;
-  right: 0;
 }
 h1 .editable:empty{
   padding-right: 8em;
@@ -201,10 +199,10 @@ h1 .editable:empty{
   padding:0 2em;
 }
 .description .editable:empty:before{
-  content: "Description";
+  content: "Mélanger, verser...";
 }
 .description .editable:empty{
-  padding:0 2.5em;
+  padding:0 4em;
 }
 .ingredient h3 .editable:empty:before{
   content: "Ingrédient";
