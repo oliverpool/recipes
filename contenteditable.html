@@ -397,13 +397,27 @@ Vue.component('recipe-step', {
         return !item.hasOwnProperty('of');
       });
     },
+    isLastStep: function(container){
+      return container == this.model;
+    },
     isRemovable: function (container){
-      return this.hasDescription(container) &&
-        !container.ingredients.length &&
-        (this.parent || container != this.model || this.hasDescription(container.container));
+      // Raw container: no.
+      if(!this.hasDescription(container)){
+        return false;
+      }
+      // No ingredients and not the "global root alone".
+      if(!container.ingredients.length &&
+          (this.parent || !this.isLastStep(container) || this.hasDescription(container.container)) ){
+        return true;
+      }
+      // Followed by a raw container, last in chanin and not at root
+      if(!this.hasDescription(container.container) && this.isLastStep(container) && this.parent){
+        return true;
+      }
+      return false;
     },
     remove: function (container){
-      if(container == this.model){
+      if(this.isLastStep(container)){
         // first in the chain
         if(!this.parent){
           // recipe root
@@ -413,7 +427,9 @@ Vue.component('recipe-step', {
           var idx = this.parent.ingredients.indexOf(container);
           this.parent.ingredients.$set(idx, container.container);
         } else {
-          // completely removed
+          // Transfer ingredients
+          var ingredients = container.ingredients;
+          Array.prototype.push.apply(this.parent.ingredients, ingredients);
           this.parent.ingredients.$remove(container);
         }
       } else {
