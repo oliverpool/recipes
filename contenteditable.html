@@ -237,6 +237,21 @@ h1 .editable:empty{
 .hovergroup.-focus .quantity.-editable + .quantity{
   display: none;
 }
+
+.hovergroup.-focus:not(.header){
+  border-color:rgba(0,100,0,1);
+  box-shadow: 0 0 15px rgba(0,0,100,1);
+}
+
+.hovergroup.-focus .container.-raw .editable{
+  margin-right: 10px;
+}
+.hovergroup.-focus.action{
+  padding-right: 15px;
+}
+
+/* URL Reader */
+
 .url.-reader{
   white-space:nowrap;
   overflow:hidden;
@@ -247,25 +262,20 @@ h1 .editable:empty{
   color:gray;
 }
 
-.hovergroup.-focus:not(.header){
-  border-color:rgba(0,100,0,1);
-  box-shadow: 0 0 15px rgba(0,0,100,1);
-}
-
 
 /* Removal */
 button.remove{
   border-radius: 50%;
   border: none;
   color: red;
-  background-color: rgba(100,100,100,0.2);
+  background-color: rgba(240,240,240,0.8);
   opacity: 1;
   width: 25px;
   height: 25px;
   font-size: 1.5em;
   display: none;
 }
-.hovergroup.-focus:not(.header) button.remove{
+.hovergroup.-focus:not(.header) button{
   display: block;
 }
 button.remove:hover{
@@ -282,6 +292,43 @@ button.remove:hover{
   top: -10px;
   left: 12px;
 }
+
+/* Adders */
+button.add{
+  position: absolute;
+  border: 1px solid gray;
+  background-color: #c2e1f5;
+  width: 25px;
+  height: 25px;
+  display: none;
+}
+button.add:not(:hover){
+  opacity: .7;
+}
+button.add.-raw-ingredient{
+  top: -20px;
+  right: 0;
+  border-radius: 50%;
+  background-color: #FFF9C4;
+  border: 1px solid black;
+}
+button.add.-after{
+  top: 50%;
+  right: -11px;
+  margin-top:-12.5px;
+  z-index: 5;
+}
+button.add.-step-ingredient{
+  top: -20px;
+  right: 30px;
+}
+button.add.-below{
+  bottom: -18px;
+  left: 50%;
+  margin-left:-12.5px;
+  z-index: 5;
+}
+
   </style>
 
   <title></title>
