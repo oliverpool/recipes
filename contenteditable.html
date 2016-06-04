@@ -572,6 +572,7 @@ function reduceRecipe(recipe){
     <button
       @click="remove"
       class="remove"
+      tabindex="-1"
       title="Supprimer cet ingrédient">×</button>
   </div>
 </script>
@@ -623,7 +624,18 @@ function reduceRecipe(recipe){
           <button
             @click="remove(container)"
             class="remove"
+            tabindex="-1"
             title="Supprimer cette étape">×</button>
+        </template>
+        <template v-if="hasDescription(container)">
+          <button
+            class="add -step-ingredient"
+            @click="addIngredient(container, false)"
+            title="Ajouter une étape">+</button>
+          <button
+            class="add -raw-ingredient"
+            @click="addIngredient(container, true)"
+            title="Ajouter un ingrédient">+</button>
         </template>
         <button
           class="add -after"
@@ -634,16 +646,6 @@ function reduceRecipe(recipe){
             class="add -below"
             @click="addStepBelow(container)"
             title="Verser dans un nouveau récipient">+</button>
-        </template>
-        <template v-if="hasDescription(container)">
-          <button
-            class="add -raw-ingredient"
-            @click="addIngredient(container, true)"
-            title="Ajouter un ingrédient">+</button>
-          <button
-            class="add -step-ingredient"
-            @click="addIngredient(container, false)"
-            title="Ajouter une étape">+</button>
         </template>
       </div>
     </div>

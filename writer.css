@@ -163,7 +163,7 @@ button.add{
   height: 25px;
   display: none;
 }
-button.add:not(:hover){
+button.add:not(:hover):not(:focus){
   opacity: .7;
 }
 button.add.-raw-ingredient{
