@@ -78,7 +78,7 @@ h1 .editable:empty{
   padding:0 1.5em;
 }
 .hovergroup .-hideable .editable:empty,
-.hovergroup div.-empty{
+.hovergroup:not(.header) div.-empty{
   display: none;
 }
 .hovergroup.-focus .editable:empty{
