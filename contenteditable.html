@@ -90,6 +90,13 @@ Vue.component('recipe-ingredient', {
   methods: {
     remove: function (event){
       this.parent.ingredients.$remove(this.model);
+    },
+    focusOnMainField: function(event){
+      var activeHovergroup = findHovergroup(document.activeElement);
+      var localHovergroup = findHovergroup(event.target);
+      if(activeHovergroup != localHovergroup){
+        localHovergroup.querySelector('h3 span[contenteditable="true"]').focus();
+      }
     }
   },
 });
@@ -275,7 +282,21 @@ Vue.component('recipe-step', {
           description: "",
           container: "",
         });
-        userFocus('.container.-raw span[contenteditable="true"]:empty');
+        delayedUserFocus('.container.-raw span[contenteditable="true"]:empty');
+      }
+    },
+    focusOnRaw: function(event){
+      var activeHovergroup = findHovergroup(document.activeElement);
+      var localHovergroup = findHovergroup(event.target);
+      if(activeHovergroup != localHovergroup){
+        localHovergroup.querySelector('.container.-raw span[contenteditable="true"]').focus();
+      }
+    },
+    focusOnContainer: function(event){
+      var activeHovergroup = findHovergroup(document.activeElement);
+      var localHovergroup = findHovergroup(event.target);
+      if(activeHovergroup != localHovergroup){
+        localHovergroup.querySelector('.description span[contenteditable="true"]').focus();
       }
     }
   },
@@ -588,7 +609,7 @@ function reduceRecipe(recipe){
   <option value="L">
 </datalist>
 <script type="text/x-template" id="recipe-ingredient-template">
-  <div class="ingredient -raw hovergroup">
+  <div class="ingredient -raw hovergroup" @click="focusOnMainField">
     <recipe-quantity :model="model.quantity">
     </recipe-quantity>
     <h3><edit-text :field.sync="model.of"></edit-text></h3>
@@ -629,19 +650,20 @@ function reduceRecipe(recipe){
       </div>
     </div>
     <div class="step-actions">
-      <div class="action hovergroup -container">
+      <div class="action hovergroup -container" @click="focusOnRaw">
         <span
           class="container -raw">
           <edit-text :field.sync="allContainers[0].container"></edit-text>
         </span>
         <button
           class="add -after"
-          @click="addStepAfter(allContainers[0].container)"
+          @click.stop="addStepAfter(allContainers[0].container)"
           title="Ajouter une étape juste après">+</button>
       </div>
       <div
         v-for="container in allContainers"
-        class="action hovergroup">
+        class="action hovergroup"
+        @click="focusOnContainer">
         <span class="description">
           <em>
             <edit-text :field.sync="container.description"></edit-text>
@@ -660,20 +682,20 @@ function reduceRecipe(recipe){
         </template>
         <button
           class="add -step-ingredient"
-          @click="addIngredient(container, false)"
+          @click.stop="addIngredient(container, false)"
           title="Ajouter une étape">+</button>
         <button
           class="add -raw-ingredient"
-          @click="addIngredient(container, true)"
+          @click.stop="addIngredient(container, true)"
           title="Ajouter un ingrédient">+</button>
         <button
           class="add -after"
-          @click="addStepAfter(container)"
+          @click.stop="addStepAfter(container)"
           title="Ajouter une étape juste après">+</button>
         <template v-if="isLastStep(container)">
           <button
             class="add -below"
-            @click="addStepBelow(container)"
+            @click.stop="addStepBelow(container)"
             title="Verser dans un nouveau récipient">+</button>
         </template>
       </div>
