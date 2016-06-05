@@ -19,6 +19,9 @@ var FOCUSOUT_DELAY = 5000;
 function findHovergroup(initialElement){
   var hovergroup = initialElement;
   while(!hovergroup.classList.contains('hovergroup')){
+    if(!hovergroup.parentNode.classList){
+      return null;
+    }
     hovergroup = hovergroup.parentNode;
   }
   return hovergroup;
@@ -40,7 +43,7 @@ function setFocusOn(hovergroup) {
 }
 
 // Set the user focus on a field for next Tick
-function userFocus(classname){
+function delayedUserFocus(classname){
   Vue.nextTick(function(){
     var input = document.querySelector(classname);
     if(input){
@@ -247,7 +250,7 @@ Vue.component('recipe-step', {
           'container': container,
         }
       }
-      userFocus('.description span[contenteditable="true"]:empty');
+      delayedUserFocus('.description span[contenteditable="true"]:empty');
     },
     addStepBelow: function(container){
       var clone = JSON.parse(JSON.stringify(container));
@@ -255,7 +258,7 @@ Vue.component('recipe-step', {
       container.description = "";
       container.container = "";
       container.ingredients = [clone];
-      userFocus('.container.-raw span[contenteditable="true"]:empty');
+      delayedUserFocus('.container.-raw span[contenteditable="true"]:empty');
     },
     addIngredient: function(container, raw){
       if(raw){
@@ -264,7 +267,7 @@ Vue.component('recipe-step', {
           "of": "",
           "select": "",
         });
-        userFocus('h3 span[contenteditable="true"]:empty');
+        delayedUserFocus('h3 span[contenteditable="true"]:empty');
       } else {
         container.ingredients.push({
           ingredients: [],
