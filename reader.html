@@ -19,12 +19,18 @@
 <script type="text/javascript">//<![CDATA[
 window.onload=function(){
 Vue.config.devtools = true;
+Vue.component('recipe-serving', {
+  template: '#recipe-serving-template',
+  props: {
+    model: Object
+  },
+});
 Vue.component('recipe-duration', {
   template: '#recipe-duration-template',
   props: {
     model: Object
   },
- });
+});
 Vue.component('recipe-ingredient', {
   template: '#recipe-ingredient-template',
   props: {
@@ -147,6 +153,10 @@ window.onhashchange = function(){
   <div>
     <a href="./contenteditable.html#{{hash}}">Éditer la recette</a>
     <h1>{{model.name}}</h1>
+    <recipe-serving
+        v-if="model.serving"
+      :model="model.serving">
+     </recipe-serving>
     <recipe-duration
         v-if="model.duration"
       :model="model.duration">
@@ -157,8 +167,13 @@ window.onhashchange = function(){
     </recipe-step>
   </div>
 </script>
+<script type="text/x-template" id="recipe-serving-template">
+  <div>
+    ◴&nbsp;{{model.value}} {{model.unit}}
+  </div>
+</script>
 <script type="text/x-template" id="recipe-duration-template">
-    <div>
+  <div>
     ⌛&nbsp;{{model.value}} {{model.unit}}
   </div>
 </script>

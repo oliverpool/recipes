@@ -62,6 +62,10 @@ var recipeStore = function(){
       "value": 60,
       "unit": "min"
     },
+    "serving": {
+      "value": 4,
+      "unit": "Personnes",
+    },
     "recipe": {
       "duration": {
         "value": 50,

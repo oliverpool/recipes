@@ -53,6 +53,12 @@ function delayedUserFocus(classname){
 }
 
 Vue.config.devtools = true;
+Vue.component('recipe-serving', {
+  template: '#recipe-serving-template',
+  props: {
+    model: Object
+  }
+});
 Vue.component('recipe-duration', {
   template: '#recipe-duration-template',
   props: {
@@ -75,7 +81,7 @@ Vue.component('recipe-duration', {
       setFocusOn(this.hovergroup);
     }
   }
- });
+});
 Vue.component('recipe-ingredient', {
   template: '#recipe-ingredient-template',
   props: {
@@ -451,6 +457,9 @@ function expandRecipe(recipe){
   }
 
   addDefaultDurations(recipe);
+  if(!recipe.hasOwnProperty('serving') || !recipe.serving){
+    recipe.serving = {};
+  }
 
   exploreStep = function(step){
     addDefaultDurations(step);
@@ -480,6 +489,9 @@ function reduceRecipe(recipe){
   }
 
   removeDefaultDurations(recipe);
+  if(!recipe.serving.value || recipe.serving.value == "0"){
+    delete recipe.serving;
+  }
 
   exploreStep = function(step){
     removeDefaultDurations(step);
@@ -539,6 +551,9 @@ function reduceRecipe(recipe){
       <em v-else>Génération en cours...</em>
       </span>
       <h1><edit-text :field.sync="model.name"></edit-text></h1>
+      <recipe-serving
+        :model="model.serving">
+      </recipe-serving>
       <recipe-duration
         :model="model.duration">
       </recipe-duration>
@@ -574,8 +589,28 @@ function reduceRecipe(recipe){
 <datalist id="duration-unit">
   <option value="sec">
   <option value="min">
+  <option value="h">
   <option value="jour">
   <option value="nuit">
+</datalist>
+<script type="text/x-template" id="recipe-serving-template">
+  <div>
+  ◴&nbsp;<input
+    type="number"
+    v-model="model.value"
+    placeholder="Nombre"
+    step="any"
+    min="0"
+    ><input
+    type="text"
+    v-model="model.unit"
+    placeholder="Unité"
+    list="serving-unit"
+    size="10">
+  </div>
+</script>
+<datalist id="serving-unit">
+  <option value="Personnes">
 </datalist>
 <script type="text/x-template" id="recipe-quantity-template">
   <span
