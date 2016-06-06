@@ -25,25 +25,21 @@ function findHovergroup(initialElement){
   return hovergroup;
 }
 
-function setFocusOn(hovergroup) {
-  if(hovergroup.dataset.timer){
-    clearTimeout(hovergroup.dataset.timer);
-    hovergroup.dataset.timer = "";
+function findAuxiliaryHovergroup(hovergroup){
+  if(hovergroup.classList.contains('ingredient')){
+    var stepNode = hovergroup.parentNode.parentNode.parentNode.parentNode;
+    var index = hovergroup.dataset.containerIndex;
+    return stepNode.querySelector('.action.hovergroup[data-container-index="'+ index +'"]');
   }
+  return null;
+}
+
+function setFocusOn(hovergroup) {
   var elems = document.getElementsByClassName('-focus');
   var hasFocus = false;
 
-  var auxiliaryHovergroup = null;
-  if(hovergroup.classList.contains('ingredient')){
-    // Focus on parent as well
-    var stepNode = hovergroup.parentNode.parentNode.parentNode.parentNode;
-    var index = hovergroup.dataset.containerIndex;
-    var auxiliaryHovergroup = stepNode.querySelector('.action.hovergroup[data-container-index="'+ index +'"]');
-    if(auxiliaryHovergroup.dataset.timer){
-      clearTimeout(auxiliaryHovergroup.dataset.timer);
-      auxiliaryHovergroup.dataset.timer = "";
-    }
-  }
+  // Focus on parent as well
+  var auxiliaryHovergroup = findAuxiliaryHovergroup(hovergroup);
 
   for (var i = elems.length - 1; i >= 0; i--) {
     if(elems[i] == hovergroup){
@@ -60,11 +56,18 @@ function setFocusOn(hovergroup) {
   }
 }
 
-function releaseFocus(hovergroup){
-  hovergroup.dataset.timer = setTimeout(function(){
-    hovergroup.classList.remove('-focus');
-  }, 5000);
+
+function clearFocus(){
+  var activeHovergroup = findHovergroup(document.activeElement);
+  if(!activeHovergroup){
+    var elems = document.getElementsByClassName('-focus');
+
+    for (var i = elems.length - 1; i >= 0; i--) {
+      elems[i].classList.remove('-focus');
+    }
+  }
 }
+document.body.onclick = clearFocus;
 
 // Set the user focus on a field for next Tick
 function delayedUserFocus(classname){
@@ -89,9 +92,6 @@ Vue.component('recipe-duration', {
     model: Object
   },
   methods: {
-    focusout: function(e){
-      releaseFocus(this.hovergroup);
-    },
     focusin: function(e){
       if(!this.hovergroup){
         this.hovergroup = findHovergroup(e.target);
@@ -130,9 +130,6 @@ Vue.component('recipe-quantity', {
     model: Object
   },
   methods: {
-    focusout: function(e){
-      releaseFocus(this.hovergroup);
-    },
     focusin: function(e){
       if(!this.hovergroup){
         this.hovergroup = findHovergroup(e.target);
@@ -410,7 +407,6 @@ Vue.component('edit-text', {
     },
     update: function(e){
       e.target.innerText = this.clean(e);
-      releaseFocus(this.hovergroup);
     },
     prepare: function(e){
       if(!this.field.length){
@@ -591,7 +587,6 @@ function reduceRecipe(recipe){
     step="any"
     min="0"
     @focusin="focusin"
-    @focusout="focusout"
     ><input
     type="text"
     v-model="model.unit"
@@ -599,7 +594,7 @@ function reduceRecipe(recipe){
     list="duration-unit"
     size="5"
     @focusin="focusin"
-    @focusout="focusout" >
+    >
   </div>
 </script>
 <datalist id="duration-unit">
@@ -641,14 +636,14 @@ function reduceRecipe(recipe){
       step="any"
       min="0"
       @focusin="focusin"
-      @focusout="focusout"><input
+      ><input
       type="text"
       v-model="model.unit"
       placeholder="Unité"
       list="quantity-unit"
       size="5"
       @focusin="focusin"
-      @focusout="focusout">
+      >
   </span><span class="quantity" @click="focusin">
     {{model.value}} {{model.unit}}
   </span>
