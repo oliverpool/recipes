@@ -7,6 +7,7 @@
   <script type="text/javascript" src="vendor/js/pako.min.js"></script>
   <script type="text/javascript" src="vendor/js/vue.js"></script>
   <script type="text/javascript" src="recipes.js"></script>
+  <script type="text/javascript" src="cookbooks.js"></script>
   <link rel="stylesheet" type="text/css" href="reader.css">
   <title>Afficher une recette de cuisine</title>
 
@@ -91,8 +92,7 @@ function loadFromHash(){
     if(location.hash.substr(1)){
       alert('Erreur lors du chargement de la recette : chargement d\'une recette aléatoire');
     }
-    recipe = recipeStore.random();
-    location.hash = '#' + hashConvertor.fromJSON(recipe);
+    recipe = cookbookManager.get('random');
   }
   document.title = recipe.name + " - Recette de cuisine";
   return recipe;
@@ -110,11 +110,11 @@ Vue.component('recipe-root', {
     hash: function(){
       return hashConvertor.fromJSON(this.model);
     },
-    list: function(){
-      return recipeStore.list;
+    titles: function(){
+      return cookbookManager.titles();
     }
   }
-})
+});
 
 // boot up Vue
 var vm = new Vue({el: '#recipe'});
@@ -139,14 +139,14 @@ window.onhashchange = function(){
 
 <script type="text/x-template" id="recipe-template">
   <ul>
-    <li v-for="(name, hash) of list">
-      <a href="./reader.html#{{hash}}">{{name}}</a>
+    <li v-for="title in titles">
+      <a href="./reader.html#cookbook-{{title.hash}}">{{title.name}}</a>
     </li>
     <li>
-      [<a href="./contenteditable.html#empty">Nouvelle recette</a>]
+      [<a href="./contenteditable.html#cookbook-empty">Nouvelle recette</a>]
     </li>
     <li>
-      [<a href="./reader.html">Recette aléatoire</a>]
+      [<a href="./reader.html#cookbook-random">Recette aléatoire</a>]
     </li>
   </ul>
 
