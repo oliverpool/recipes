@@ -25,27 +25,35 @@ var recipeManager = function(){
 
 // Requires nodeca/pako
 var hashConvertor = function(){
-  return {
-    toJSON: function(hash){
-      var parts = hash.split("-");
-      if(parts[0] != "pako"){
-        return false;
-      }
-      try{  
-        var hash_bin = atob(parts[1]);
-        var hash_str = pako.inflate(hash_bin, { to: 'string' });
-        return JSON.parse(hash_str);
-      } catch(e) {
-        console.log("Error while parsing:");
-        console.log(e);
-        return false;
-      }
-    },
-    fromJSON: function(obj){
+  var pakoToJson = function(uri){
+    try{
+      var hash_bin = atob(uri);
+      var hash_str = pako.inflate(hash_bin, { to: 'string' });
+      return JSON.parse(hash_str);
+    } catch(e) {
+      console.log("Error while parsing:");
+      console.log(e);
+      return false;
+    }
+  };
+  var pakoFromJson = function(obj){
       var obj_str = JSON.stringify(obj);
       var obj_bin = pako.deflate(obj_str, { to: 'string' });
       var obj_b64 = btoa(obj_bin);
-      return 'pako-'+obj_b64;  
+      return obj_b64;
+  };
+
+  return {
+    toJSON: function(hash){
+      var parts = hash.split("-");
+      switch (parts[0]) {
+        case "pako":
+        return pakoToJson(parts[1]);
+      }
+      return false;
+    },
+    fromJSON: function(obj){
+      return 'pako-'+pakoFromJson(obj);
     }
   }
 }();
