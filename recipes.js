@@ -45,10 +45,12 @@ var hashConvertor = function(){
 
   return {
     toJSON: function(hash){
-      var parts = hash.split("-");
-      switch (parts[0]) {
+      var i = hash.indexOf('-');
+      var algo = hash.slice(0,i);
+      var args = hash.slice(i+1);
+      switch (algo) {
         case "pako":
-        return pakoToJson(parts[1]);
+        return pakoToJson(args);
       }
       return false;
     },
