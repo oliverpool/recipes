@@ -9737,7 +9737,7 @@ var template = Object.freeze({
 
     json: {
       read: function read(value, indent) {
-        return typeof value === 'string' ? value : JSON.stringify(value, null, Number(indent) || 2);
+        return typeof value === 'string' ? value : JSON.stringify(value, null, arguments.length > 1 ? indent : 2);
       },
       write: function write(value) {
         try {
