@@ -34,15 +34,31 @@ function setFocusOn(hovergroup) {
   }
   var elems = document.getElementsByClassName('-focus');
   var hasFocus = false;
+
+  var auxiliaryHovergroup = null;
+  if(hovergroup.classList.contains('ingredient')){
+    // Focus on parent as well
+    var stepNode = hovergroup.parentNode.parentNode.parentNode.parentNode;
+    var index = hovergroup.dataset.containerIndex;
+    var auxiliaryHovergroup = stepNode.querySelector('.action.hovergroup[data-container-index="'+ index +'"]');
+    if(auxiliaryHovergroup.dataset.timer){
+      clearTimeout(auxiliaryHovergroup.dataset.timer);
+      auxiliaryHovergroup.dataset.timer = "";
+    }
+  }
+
   for (var i = elems.length - 1; i >= 0; i--) {
     if(elems[i] == hovergroup){
       hasFocus = true;
-    } else {
+    } else if(elems[i] != auxiliaryHovergroup) {
       elems[i].classList.remove('-focus');
     }
   }
   if(!hasFocus){
     hovergroup.classList.add('-focus');
+  }
+  if(auxiliaryHovergroup){
+    auxiliaryHovergroup.classList.add('-focus');
   }
 }
 
@@ -670,7 +686,7 @@ function reduceRecipe(recipe){
         <!--For the raw-container-->
       </div>
       <div
-        v-for="container in allContainers"
+        v-for="(index, container) in allContainers"
         class="preparation">
         <div
           v-if="container.ingredients"
@@ -684,6 +700,7 @@ function reduceRecipe(recipe){
             v-for="ingredient in rawIngredients(container)"
             :model="ingredient"
             :parent="container"
+            data-container-index="{{index}}"
             >
           </recipe-ingredient>
         </div>
@@ -703,6 +720,7 @@ function reduceRecipe(recipe){
       <div
         v-for="container in allContainers"
         class="action hovergroup"
+        data-container-index="{{$index}}"
         @click="focusOnContainer">
         <span class="description">
           <em>
