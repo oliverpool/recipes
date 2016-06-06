@@ -14,8 +14,6 @@
 <script type="text/javascript">//<![CDATA[
 window.onload=function(){
 
-var FOCUSOUT_DELAY = 5000;
-
 function findHovergroup(initialElement){
   var hovergroup = initialElement;
   while(!hovergroup.classList.contains('hovergroup')){
@@ -62,6 +60,12 @@ function setFocusOn(hovergroup) {
   }
 }
 
+function releaseFocus(hovergroup){
+  hovergroup.dataset.timer = setTimeout(function(){
+    hovergroup.classList.remove('-focus');
+  }, 5000);
+}
+
 // Set the user focus on a field for next Tick
 function delayedUserFocus(classname){
   Vue.nextTick(function(){
@@ -86,10 +90,7 @@ Vue.component('recipe-duration', {
   },
   methods: {
     focusout: function(e){
-      var hg = this.hovergroup;
-      hg.dataset.timer = setTimeout(function(){
-        hg.classList.remove('-focus');
-      }, FOCUSOUT_DELAY);
+      releaseFocus(this.hovergroup);
     },
     focusin: function(e){
       if(!this.hovergroup){
@@ -130,10 +131,7 @@ Vue.component('recipe-quantity', {
   },
   methods: {
     focusout: function(e){
-      var hg = this.hovergroup;
-      hg.dataset.timer = setTimeout(function(){
-        hg.classList.remove('-focus');
-      }, FOCUSOUT_DELAY);
+      releaseFocus(this.hovergroup);
     },
     focusin: function(e){
       if(!this.hovergroup){
@@ -412,10 +410,7 @@ Vue.component('edit-text', {
     },
     update: function(e){
       e.target.innerText = this.clean(e);
-      var hg = this.hovergroup;
-      hg.dataset.timer = setTimeout(function(){
-        hg.classList.remove('-focus');
-      }, FOCUSOUT_DELAY);
+      releaseFocus(this.hovergroup);
     },
     prepare: function(e){
       if(!this.field.length){
