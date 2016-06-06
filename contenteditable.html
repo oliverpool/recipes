@@ -266,11 +266,13 @@ Vue.component('recipe-step', {
       delayedUserFocus('.description span[contenteditable="true"]:empty');
     },
     addStepBelow: function(container){
-      var clone = JSON.parse(JSON.stringify(container));
-      container.duration = {};
-      container.description = "";
-      container.container = "";
-      container.ingredients = [clone];
+      this.model = {
+        'duration': {},
+        'description': "",
+        'container': "",
+        'ingredients': [container],
+      };
+
       delayedUserFocus('.container.-raw span[contenteditable="true"]:empty');
     },
     addIngredient: function(container, raw){
@@ -403,7 +405,7 @@ Vue.component('edit-text', {
     },
     prepare: function(e){
       if(!this.field.length){
-        // prevent bug when initially empty of repeated strings
+        // prevent bug when initially empty (repeated strings)
         e.target.innerText = "";
       }
       if(!this.hovergroup){
@@ -414,6 +416,14 @@ Vue.component('edit-text', {
       }
       setFocusOn(this.hovergroup);
     }
+  },
+  watch: {
+    field: function (val, oldVal) {
+      if(val.length == 0){
+        // prevent bug on addStepBelow
+        this.$el.innerText = "";
+      }
+    },
   }
 });
 
