@@ -33,49 +33,28 @@ input[type="number"]{
 .quantity{
   white-space: nowrap;
 }
-.editable:empty{
-  width: 1px;
-  display: inline-block;
-  position: relative;
+.editable{
+  padding:0 .2em;
 }
 .editable:empty:before{
   content: "*placeholder*";
-  position: absolute;
-  left: 0;
-  right: 0;
-  text-align: center;
   white-space: nowrap;
   color: #888;
 }
 h1 .editable:empty:before{
   content: "Titre de la recette";
 }
-h1 .editable:empty{
-  padding-right: 8em;
-}
 .container.-raw .editable:empty:before{
   content: "Récipient";
-}
-.container.-raw .editable:empty{
-  padding:0 2em;
 }
 .description .editable:empty:before{
   content: "Mélanger, verser...";
 }
-.description .editable:empty{
-  padding:0 4em;
-}
 .ingredient h3 .editable:empty:before{
   content: "Ingrédient";
 }
-.ingredient h3 .editable:empty{
-  padding:0 2.5em;
-}
 .ingredient em .editable:empty:before{
   content: "Extrait";
-}
-.ingredient em .editable:empty{
-  padding:0 1.5em;
 }
 .hovergroup .-hideable .editable:empty,
 .hovergroup:not(.header) div.-empty{
