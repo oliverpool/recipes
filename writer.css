@@ -114,6 +114,7 @@ button.remove{
   height: 25px;
   font-size: 1.5em;
   display: none;
+  padding: 0;
 }
 .hovergroup.-focus:not(.header) button{
   display: block;
