@@ -540,7 +540,7 @@ function reduceRecipe(recipe){
 </div>
 
 <script type="text/x-template" id="edit-text">
-  <span contenteditable="true" @focusout="update" @input="clean" @focusin="prepare" class="editable">{{field}}</span>
+  <span contenteditable="true" @focusout="update" @input="clean" @focus="prepare" class="editable">{{field}}</span>
 </script>
 
 <script type="text/x-template" id="recipe-template">
