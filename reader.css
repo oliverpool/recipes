@@ -23,6 +23,7 @@ body {
   /* Old version */
   display: inline-block;
   vertical-align: bottom;
+  white-space: normal;
 }
 
 .description{
