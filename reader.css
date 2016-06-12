@@ -8,9 +8,21 @@ body {
 
 
 .ingredients{
+  /*
+  New version with flexbox
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
+  */
+  /* Old version */
+  white-space: nowrap;
+  text-align: center;
+}
+
+.ingredients > div {
+  /* Old version */
+  display: inline-block;
+  vertical-align: bottom;
 }
 
 .description{
