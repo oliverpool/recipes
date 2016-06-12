@@ -585,14 +585,14 @@ function reduceRecipe(recipe){
     placeholder="Durée"
     step="any"
     min="0"
-    @focusin="focusin"
+    @focus="focusin"
     ><input
     type="text"
     v-model="model.unit"
     placeholder="Unité"
     list="duration-unit"
     size="5"
-    @focusin="focusin"
+    @focus="focusin"
     >
   </div>
 </script>
@@ -634,14 +634,14 @@ function reduceRecipe(recipe){
       placeholder="Quantité"
       step="any"
       min="0"
-      @focusin="focusin"
+      @focus="focusin"
       ><input
       type="text"
       v-model="model.unit"
       placeholder="Unité"
       list="quantity-unit"
       size="5"
-      @focusin="focusin"
+      @focus="focusin"
       >
   </span><span class="quantity" @click="focusin">
     {{model.value}} {{model.unit}}
