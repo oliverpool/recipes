@@ -28,9 +28,9 @@ function findHovergroup(initialElement){
 
 function findAuxiliaryHovergroup(hovergroup){
   if(hovergroup.classList.contains('ingredient')){
-    var stepNode = hovergroup.parentNode.parentNode.parentNode.parentNode;
+    var stepNode = hovergroup.parentNode.parentNode.parentNode.parentNode.parentNode;
     var actionNode = stepNode.querySelector('.step-preparations').nextElementSibling;
-    var index = hovergroup.dataset.containerIndex;
+    var index = hovergroup.parentNode.dataset.containerIndex;
     return actionNode.querySelector('.step-actions .action.hovergroup[data-container-index="'+ index +'"]');
   }
   return null;
