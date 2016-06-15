@@ -655,18 +655,20 @@ function reduceRecipe(recipe){
   <option value="L">
 </datalist>
 <script type="text/x-template" id="recipe-ingredient-template">
-  <div class="ingredient -raw hovergroup" @click="focusOnMainField">
-    <recipe-quantity :model="model.quantity">
-    </recipe-quantity>
-    <h3><edit-text :field.sync="model.of"></edit-text></h3>
-    <em class="-hideable">
-      <edit-text :field.sync="model.select"></edit-text>
-    </em>
-    <button
-      @click="remove"
-      class="remove"
-      tabindex="-1"
-      title="Supprimer cet ingrédient">×</button>
+  <div>
+    <div class="ingredient -raw hovergroup" @click="focusOnMainField">
+      <recipe-quantity :model="model.quantity">
+      </recipe-quantity>
+      <h3><edit-text :field.sync="model.of"></edit-text></h3>
+      <em class="-hideable">
+        <edit-text :field.sync="model.select"></edit-text>
+      </em>
+      <button
+        @click="remove"
+        class="remove"
+        tabindex="-1"
+        title="Supprimer cet ingrédient">×</button>
+    </div>
   </div>
 </script>
 <script type="text/x-template" id="recipe-step-template">

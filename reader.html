@@ -183,21 +183,23 @@ window.onhashchange = function(){
   </span>
 </script>
 <script type="text/x-template" id="recipe-ingredient-template">
+  <div>
     <div class="ingredient -raw">
-    <span
-      v-if="hasSimpleQuantity"
-      class="quantity">
-      {{model.quantity}}
-    </span>
-    <recipe-quantity
-      v-else
-      :model="model.quantity">
-    </recipe-quantity>
-    <h3>{{model.of}}</h3>
-    <em
-      v-if="model.select">
-        {{model.select}}
-    </em>
+      <span
+        v-if="hasSimpleQuantity"
+        class="quantity">
+        {{model.quantity}}
+      </span>
+      <recipe-quantity
+        v-else
+        :model="model.quantity">
+      </recipe-quantity>
+      <h3>{{model.of}}</h3>
+      <em
+        v-if="model.select">
+          {{model.select}}
+      </em>
+    </div>
   </div>
 </script>
 <script type="text/x-template" id="recipe-step-template">

@@ -15,15 +15,15 @@ body {
   justify-content: space-around;
   */
   /* Old version */
-  white-space: nowrap;
   text-align: center;
+  display: table-row;
 }
 
 .ingredients > div {
   /* Old version */
   display: inline-block;
   vertical-align: bottom;
-  white-space: normal;
+  display: table-cell;
 }
 
 .description{
@@ -63,7 +63,7 @@ body {
   position: relative;
   background-color: #FFF9C4;
   margin: 5px;
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 .ingredient.-raw:after{
   content: "↓";
