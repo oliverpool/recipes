@@ -1016,10 +1016,17 @@
     canvas: function(data) {
       data = normalizeData(data);
 
+      // Determine the ECC level to be applied.
+      eccLevel = ECC_LEVELS[(data.level && data.level.toUpperCase()) || 'L'];
+
+      // Generate the image frame for the given `value`.
+      var frame = generateFrame(data.value || '');
+
       // Module size of the generated QR code (i.e. 1-10).
       var size = data.size >= 1 && data.size <= 10 ? data.size : 4;
       // Actual size of the QR code symbol and is scaled to 25 pixels (e.g. 1 = 25px, 3 = 75px).
-      size *= 25;
+      size *= width;
+      //size *= 25;
 
       // `<canvas>` element used to render the QR code.
       var cvs = data.canvas || createCanvas();
@@ -1031,12 +1038,6 @@
       // Fill the canvas with the correct background colour.
       c2d.fillStyle = data.background || '#fff';
       c2d.fillRect(0, 0, size, size);
-
-      // Determine the ECC level to be applied.
-      eccLevel = ECC_LEVELS[(data.level && data.level.toUpperCase()) || 'L'];
-
-      // Generate the image frame for the given `value`.
-      var frame = generateFrame(data.value || '');
 
       c2d.lineWidth = 1;
 
