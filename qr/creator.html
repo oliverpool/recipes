@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr-fr" >
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta name="robots" content="noindex, nofollow">
+		<meta name="googlebot" content="noindex, nofollow">
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=yes">
+		<title>Générer un QRcode™ à partir d'une recette</title>
+		<script type="text/javascript" src="../vendor/js/qr.js"></script>
+	</head>
+	<body id="body">
+		<img id="qr-img"/>
+		<script type="text/javascript">
+		window.onload = function(){
+			var hash = location.hash.substr(1);
+			var i = hash.indexOf('-');
+			var algo = hash.slice(0,i);
+			var args = hash.slice(i+1);
+			if(algo != 'pako'){
+				alert('This kind of hash is not supported');
+				return;
+			}
+			var bstring = atob(args);
+			qr.image({
+			image: document.getElementById('qr-img'),
+			value: bstring,
+			size:15
+			});
+		};
+		</script>
+	</body>
+</html>
