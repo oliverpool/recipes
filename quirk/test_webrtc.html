@@ -109,11 +109,7 @@ function testZXing() {
 		var decodeCallback = function(ptr, len, resultIndex, resultCount) {
 			var result = new Uint8Array(ZXing.HEAPU8.buffer, ptr, len);
 			var str = String.fromCharCode.apply(null, result);
-			if (resultIndex === 0) {
-				//window.resultString = '';
-			}
 			decoded(str);
-			//window.resultString += str + '<br>';
 		};
 		var decodePtr = ZXing.Runtime.addFunction(decodeCallback);
 
@@ -145,14 +141,8 @@ function testZXing() {
 			//console.time('a')
 			ctx.drawImage(video, 0, 0, width, height);
 			var imageData = ctx.getImageData(0,0, width, height);
-			data = imageData.data;
 
-			for (var i=0, j=0; i<data.length; i+=4, j++) {
-				// ZXing.HEAPU8[image + j] = data[i];
-				ZXing.HEAPU8[image + j] = 0.2989 * data[i + 0] + 0.5870 * data[i + 1] + 0.1140 * data[i + 2] ;
-			}
-
-			var err = ZXing._decode_qr(decodePtr);
+			var err = decodeData(imageData.data, image);
 			// err = ZXing._decode_any();
 			// err = ZXing._decode_multi();
 
@@ -165,6 +155,15 @@ function testZXing() {
 
 			//console.timeEnd('a')
 		}
+
+        function decodeData(data, offset) {
+            for (var i=0, j=0; i<data.length; i+=4, j++) {
+                // ZXing.HEAPU8[image + j] = data[i];
+                ZXing.HEAPU8[offset + j] = 0.2989 * data[i + 0] + 0.5870 * data[i + 1] + 0.1140 * data[i + 2] ;
+            }
+
+            return ZXing._decode_qr(decodePtr);
+        }
 
 		getFrame();
 
