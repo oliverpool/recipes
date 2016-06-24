@@ -107,7 +107,7 @@
     QCodeDecoder().decodeFromCamera(document.getElementById('cameraPreview'),function (err, result) {
       var oStatus = document.getElementById("status");
       oStatus.innerText = "Lecture...";
-      if (!err && result && result.length){
+      if (result && result.length){
         var hash = btoa(result);
         var link = '../reader.html#pako-'+hash;
         if(document.getElementById('updateLocation').checked){
@@ -117,7 +117,7 @@
         oStatus.innerHTML = '<a href="'+link+'">Voir la recette associée</a>';
         oStatus.classList.add('success');
       } else {
-        oStatus.innerText = "Echec" + Math.random();
+        oStatus.innerText = "Echec" + Math.random()+" "+err;
         console.log(err);
         console.log(result);
       }
