@@ -115,10 +115,11 @@
 
         function takeAndProcessSnapshot() {
           oStatus.innerText = 'Scan en cours';
-            Webcam.snap( function(data_uri) {
-              QCodeDecoder()
-                .decodeFromImage(data_uri, snapshotProcessed);
-            } );
+          Webcam.snap( function(data_uri) {
+            oStatus.innerText = 'took';
+            QCodeDecoder().decodeFromImage(data_uri, snapshotProcessed);
+            oStatus.innerText = 'process';
+          });
         }
         function snapshotProcessed(err, res) {
           if(oStatus.innerText.length > 16){
@@ -126,6 +127,7 @@
           } else {
             oStatus.innerText += '.';
           }
+          oStatus.innerText = 'processed';
           if(res){
             var hash = btoa(res);
             var link = '../reader.html#pako-'+hash;
