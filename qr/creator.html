@@ -74,7 +74,7 @@
 			canvas.height = lastline + qrCanvas.height;
 			context = canvas.getContext('2d');
 			context.fillStyle = backColor;
-			context.fillRect(0, 0, canvas.width, canvas.height);
+			context.fillRect(0, lastline, canvas.width, qrCanvas.height);
 			context.font = textFont;
 			context.fillStyle = textColor;
 			wrapText(context, text, x, y, maxWidth, lineHeight);

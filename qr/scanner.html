@@ -62,6 +62,10 @@
         if(res){
           var hash = btoa(res);
           var link = '../reader.html#pako-'+hash;
+          if(document.getElementById('updateLocation').checked){
+            document.getElementById('updateLocation').checked = false;
+            window.location.href = link;
+          }
           oStatus.innerHTML = '<a href="'+link+'">Voir la recette associée</a>';
           oStatus.classList.add('success');
         } else if(err) {
@@ -77,7 +81,13 @@
       return function () {
         var aFiles = document.getElementById("imageInput").files;
         if (aFiles.length === 0) { return; }
-        if (!rFilter.test(aFiles[0].type)) { alert("You must select a valid image file!"); return; }
+        if (!rFilter.test(aFiles[0].type)) {
+          var oStatus = document.getElementById("status");
+          oStatus.innerText = "You must select a valid image file!";
+          oStatus.classList.remove('success');
+          oStatus.classList.add('error');
+          return;
+        }
         oFReader.readAsDataURL(aFiles[0]);
       }
 
@@ -87,9 +97,10 @@
   })();
   </script>
 
-  <input id="imageInput" type="file" onchange="loadImageFile();" />
+  <input id="imageInput" type="file" onchange="loadImageFile();" accept="image/*" />
   <div id="status">Veuillez choisir un QRCode</div>
   <div id="imagePreview"></div>
+  <label><input type="checkbox" checked="checked" id="updateLocation"/>Afficher la recette immédiatement</label>
 
 </body>
 </html>

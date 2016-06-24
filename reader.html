@@ -111,6 +111,11 @@ Vue.component('recipe-root', {
     hash: function(){
       return hashConvertor.fromJSON(this.model);
     },
+    qrhash: function(){
+      console.log(this.model.name);
+      var titleHash = 'title-' + btoa(this.model.name) + '_';
+      return titleHash + hashConvertor.fromJSON(this.model);
+    },
     titles: function(){
       return cookbookManager.titles();
     }
@@ -153,6 +158,7 @@ window.onhashchange = function(){
 
   <div>
     <a href="./contenteditable.html#{{hash}}">Éditer la recette</a>
+    <a href="./qr/creator.html#{{qrhash}}">Générer un QRcode</a>
     <h1>{{model.name}}</h1>
     <recipe-serving
         v-if="model.serving"
