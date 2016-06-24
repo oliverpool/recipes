@@ -1,9 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr-fr" >
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=yes">
+  <title>Afficher une recette à partir d'un QRcode™</title>
+  <script type="text/javascript" src="../vendor/js/qcode-decoder.min.js"></script>
+  <style type="text/css">
+  input[type="file"]{
+    background-color: #e5e5e5;
+    width: 100%;
+    height: 2em;
+    border: 1px #949494 solid;
+    cursor: pointer;
+  }
+  input[type="file"]:hover{
+    border-color: #000;
+  }
+  #imagePreview img{
+    width: 100%;
+  }
+  #status{
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+  div.error{
+    color: red;
+  }
+  div.success > a,
+  div.success{
+    color: green;
+  }
+  </style>
+</head>
+<body>
 
-<!-- saved from url=(0076)https://zz85.github.io/zxing-cpp-emscripten/emscripten/test/test_webrtc.html -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>
+  <input id="imageInput" type="file" accept="image/*" />
+  <div id="status">Veuillez choisir ou pointer un QRCode avec votre caméra</div>
+  <canvas id="cameraPreview"></canvas>
+  <div id="imagePreview"></div>
+  <label><input type="checkbox" checked="checked" id="updateLocation"/>Afficher la recette immédiatement</label>
 
-<script async="" src="./test_webrtc_files/zxing.js"></script>
-<div id="scanned">error: -2</div>
+
+<script src="./test_webrtc_files/zxing.js"></script>
 <script>
 
 var image;
@@ -71,10 +111,10 @@ function testZXing() {
 			var result = new Uint8Array(ZXing.HEAPU8.buffer, ptr, len);
 			var str = String.fromCharCode.apply(null, result);
 			if (resultIndex === 0) {
-				window.resultString = '';
+				//window.resultString = '';
 			}
-			alert(btoa(str));
-			window.resultString += str + '<br>';
+			decoded(str);
+			//window.resultString += str + '<br>';
 		};
 		var decodePtr = ZXing.Runtime.addFunction(decodeCallback);
 
@@ -87,13 +127,13 @@ function testZXing() {
 				width = video.videoWidth, height = video.videoHeight;
 				log('video', width, height, video);
 
-				var canvas = document.createElement('canvas');
+				var canvas = document.getElementById('cameraPreview');
 				canvas.width = width;
 				canvas.height = height;
 				//canvas.style.transform = 'scale(-1, 1)';
 
 				ctx = canvas.getContext('2d');
-				document.body.appendChild(canvas);
+				//document.body.appendChild(canvas);
 
 				log('start');
 
@@ -120,16 +160,30 @@ function testZXing() {
 			// console.log("error code", err);
 			// console.log("result", window.resultString);
 
-			var r = err ? ("error: "+err) : window.resultString;
-			scanned.innerHTML = r
+			//var r = err ? ("error: "+err) : window.resultString;
+			//scanned.innerHTML = r
 
 
-			console.timeEnd('a')
+			//console.timeEnd('a')
 		}
 
 		getFrame();
 
 	};
 };
+
+function decoded(str) {
+ 	var oStatus = document.getElementById("status");
+	var hash = btoa(str);
+	var link = '../reader.html#pako-'+hash;
+	if(document.getElementById('updateLocation').checked){
+		document.getElementById('updateLocation').checked = false;
+		window.location.href = link;
+	}
+	oStatus.innerHTML = '<a href="'+link+'">Voir la recette associée</a>';
+	oStatus.classList.add('success');
+}
+
+
 </script>
 </body></html>
