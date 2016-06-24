@@ -111,10 +111,31 @@
 
         Webcam.on('live', takeAndProcessSnapshot);
 
+        var oStatus = document.getElementById("status");
+
         function takeAndProcessSnapshot() {
+          oStatus.innerText = 'Scan en cours...';
             Webcam.snap( function(data_uri) {
-                document.getElementById('my_result').innerHTML = '<img src="'+data_uri+'"/>';
+              QCodeDecoder()
+                .decodeFromImage(data_uri, snapshotProcessed);
             } );
+        }
+        function snapshotProcessed(err, res) {
+          if(res){
+            var hash = btoa(res);
+            var link = '../reader.html#pako-'+hash;
+            if(document.getElementById('updateLocation').checked){
+              document.getElementById('updateLocation').checked = false;
+              window.location.href = link;
+            }
+            oStatus.innerHTML = '<a href="'+link+'">Voir la recette associée</a>';
+            oStatus.classList.add('success');
+          } else if(err) {
+            takeAndProcessSnapshot();
+          } else {
+            oStatus.innerText = 'Problème inconnu lors de la lecture';
+            oStatus.classList.add('error');
+          }
         }
     </script>
 
