@@ -110,33 +110,27 @@
         Webcam.attach( '#my_camera' );
 
         var running = false;
+        var oStatus = document.getElementById("status");
 
         Webcam.on('live', function(){
           if(!running){
             running = true;
+            oStatus.innerText = 'Scan en cours';
             takeAndProcessSnapshot();
           }
         });
 
-        var oStatus = document.getElementById("status");
-
         function takeAndProcessSnapshot() {
-          oStatus.innerText = 'Scan en cours';
           Webcam.snap( function(data_uri) {
-            oStatus.innerText = 'took';
             QCodeDecoder().decodeFromImage(data_uri, snapshotProcessed);
-            oStatus.innerText = 'process';
           });
         }
         function snapshotProcessed(err, res) {
-          /*
-          if(oStatus.innerText.length > 16){
+          if(oStatus.innerText.length > 100){
             oStatus.innerText = 'Scan en cours';
           } else {
             oStatus.innerText += '.';
           }
-          */
-          oStatus.innerText = 'processed';
           if(res){
             var hash = btoa(res);
             var link = '../reader.html#pako-'+hash;
@@ -147,8 +141,7 @@
             oStatus.innerHTML = '<a href="'+link+'">Voir la recette associée</a>';
             oStatus.classList.add('success');
           } else if(err) {
-            oStatus.innerText = 'error'+err;
-            //takeAndProcessSnapshot();
+            takeAndProcessSnapshot();
           } else {
             oStatus.innerText = 'Problème inconnu lors de la lecture';
             oStatus.classList.add('error');
