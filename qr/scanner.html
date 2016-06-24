@@ -129,11 +129,13 @@
           });
         }
         function snapshotProcessed(err, res) {
+          /*
           if(oStatus.innerText.length > 16){
             oStatus.innerText = 'Scan en cours';
           } else {
             oStatus.innerText += '.';
           }
+          */
           oStatus.innerText = 'processed';
           if(res){
             var hash = btoa(res);
@@ -152,7 +154,5 @@
           }
         }
     </script>
-
-    <a href="javascript:void(take_snapshot())">Take Snapshot</a>
 </body>
 </html>
