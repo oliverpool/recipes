@@ -114,13 +114,18 @@
         var oStatus = document.getElementById("status");
 
         function takeAndProcessSnapshot() {
-          oStatus.innerText = 'Scan en cours...';
+          oStatus.innerText = 'Scan en cours';
             Webcam.snap( function(data_uri) {
               QCodeDecoder()
                 .decodeFromImage(data_uri, snapshotProcessed);
             } );
         }
         function snapshotProcessed(err, res) {
+          if(oStatus.innerText.length > 16){
+            oStatus.innerText = 'Scan en cours';
+          } else {
+            oStatus.innerText += '.';
+          }
           if(res){
             var hash = btoa(res);
             var link = '../reader.html#pako-'+hash;
