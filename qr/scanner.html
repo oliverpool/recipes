@@ -1,31 +1,95 @@
 <!DOCTYPE html>
 <html lang="fr-fr" >
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="googlebot" content="noindex, nofollow">
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=yes">
-    <title>Générer un QRcode™ à partir d'une recette</title>
-    <script type="text/javascript" src="../vendor/js/qcode-decoder.min.js"></script>
-  </head>
-  <body id="body">
-    <img id="image" src="QCodeDecoder_files/qrcode.png"/>
-    <script type="text/javascript">
-    window.onload = function(){
-      var image =
-      document.getElementById("image");
-      console.log('a');
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=yes">
+  <title>Afficher une recette à partir d'un QRcode™</title>
+  <script type="text/javascript" src="../vendor/js/qcode-decoder.min.js"></script>
+  <style type="text/css">
+  input[type="file"]{
+    background-color: #e5e5e5;
+    width: 100%;
+    height: 2em;
+    border: 1px #949494 solid;
+    cursor: pointer;
+  }
+  input[type="file"]:hover{
+    border-color: #000;
+  }
+  #imagePreview img{
+    width: 100%;
+  }
+  #status{
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+  div.error{
+    color: red;
+  }
+  div.success > a,
+  div.success{
+    color: green;
+  }
+  </style>
+</head>
+<body>
+  <script type="text/javascript">
+  var loadImageFile = (function () {
+    if (window.FileReader) {
+      var oPreviewImg = null, oStatus = null, oFReader = new window.FileReader(),
+        rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
 
-      var a = QCodeDecoder()
-      .decodeFromImage(image,function(er,res){
-      console.log('b');
-      console.log(res);
-      });
+      oFReader.onload = function (oFREvent) {
+        if (!oPreviewImg) {
+          var newPreview = document.getElementById("imagePreview");
+          oPreviewImg = new Image();
+          newPreview.appendChild(oPreviewImg);
+        }
+        if(!oStatus) {
+          oStatus = document.getElementById("status");
+        }
+        oStatus.classList.remove('success', 'error');
+        oStatus.innerText = 'Lecture en cours...';
+        oPreviewImg.src = oFREvent.target.result;
+        QCodeDecoder()
+          .decodeFromImage(oPreviewImg, decoded);
+      };
 
-      console.log(QCodeDecoder());
-      console.log(a);
-      console.log(image);
+      var decoded = function(err, res){
+        oStatus.innerText = 'Fait!';
+        if(res){
+          var hash = btoa(res);
+          var link = '../reader.html#pako-'+hash;
+          oStatus.innerHTML = '<a href="'+link+'">Voir la recette associée</a>';
+          oStatus.classList.add('success');
+        } else if(err) {
+          oStatus.innerText = err;
+          console.log(err);
+          oStatus.classList.add('error');
+        } else {
+          oStatus.innerText = 'Problème inconnu lors de la lecture';
+          oStatus.classList.add('error');
+        }
+      }
+
+      return function () {
+        var aFiles = document.getElementById("imageInput").files;
+        if (aFiles.length === 0) { return; }
+        if (!rFilter.test(aFiles[0].type)) { alert("You must select a valid image file!"); return; }
+        oFReader.readAsDataURL(aFiles[0]);
+      }
+
+    } else {
+      alert("Sorry, your browser can't do that (FileReader missing).");
     }
-    </script>
-  </body>
+  })();
+  </script>
+
+  <input id="imageInput" type="file" onchange="loadImageFile();" />
+  <div id="status">Veuillez choisir un QRCode</div>
+  <div id="imagePreview"></div>
+
+</body>
 </html>
