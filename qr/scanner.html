@@ -147,7 +147,8 @@
             oStatus.innerHTML = '<a href="'+link+'">Voir la recette associée</a>';
             oStatus.classList.add('success');
           } else if(err) {
-            takeAndProcessSnapshot();
+            oStatus.innerText = 'error'+err;
+            //takeAndProcessSnapshot();
           } else {
             oStatus.innerText = 'Problème inconnu lors de la lecture';
             oStatus.classList.add('error');
