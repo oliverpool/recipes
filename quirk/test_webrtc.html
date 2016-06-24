@@ -168,6 +168,51 @@ function testZXing() {
 		getFrame();
 
 	};
+
+    var oPreviewImg = null, oStatus = null, oFReader = new window.FileReader(),
+    rFilter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
+
+    oFReader.onload = function (oFREvent) {
+        if(!oStatus) {
+            oStatus = document.getElementById("status");
+        }
+        if (!oPreviewImg) {
+            oPreviewImg = new Image();
+            oPreviewImg.onload = function(){
+                var canvas = document.getElementById('cameraPreview');
+                canvas.width = oPreviewImg.width;
+                canvas.height = oPreviewImg.height;
+                ctx = canvas.getContext('2d');
+                ctx.drawImage(oPreviewImg, 0, 0);
+                image = ZXing._resize(oPreviewImg.width, oPreviewImg.height);
+                var imageData = ctx.getImageData(0,0, oPreviewImg.width, oPreviewImg.height);
+
+                var err = decodeData(imageData.data, image);
+                if(err){
+                    oStatus.innerText = 'Aucun QRcode trouvé!';
+                    oStatus.classList.remove('success');
+                    oStatus.classList.add('error');
+                }
+            }
+        }
+        oStatus.classList.remove('success', 'error');
+        oStatus.innerText = 'Lecture en cours...';
+        oPreviewImg.src = oFREvent.target.result;
+    };
+
+
+    document.getElementById('imageInput').onchange = function() {
+        var aFiles = document.getElementById("imageInput").files;
+        if (aFiles.length === 0) { return; }
+        if (!rFilter.test(aFiles[0].type)) {
+          var oStatus = document.getElementById("status");
+          oStatus.innerText = "You must select a valid image file!";
+          oStatus.classList.remove('success');
+          oStatus.classList.add('error');
+          return;
+        }
+        oFReader.readAsDataURL(aFiles[0]);
+    }
 };
 
 function decoded(str) {
