@@ -116,7 +116,13 @@
           if(!running){
             running = true;
             oStatus.innerText = 'Scan en cours';
-            takeAndProcessSnapshot();
+
+            QCodeDecoder().decodeFromCamera(document.getElementById('my_camera'),function (err, result) {
+              if (err) oStatus.innerText = err;
+
+              alert(result);
+            });
+            //takeAndProcessSnapshot();
           }
         });
 
