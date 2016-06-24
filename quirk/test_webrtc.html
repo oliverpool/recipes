@@ -100,18 +100,27 @@ function testZXing() {
 		console.log("Can't access user media", e);
 	}
 
+    var decodeCallback = function(ptr, len, resultIndex, resultCount) {
+        var result = new Uint8Array(ZXing.HEAPU8.buffer, ptr, len);
+        var str = String.fromCharCode.apply(null, result);
+        decoded(str);
+    };
+    var decodePtr = ZXing.Runtime.addFunction(decodeCallback);
+
+    function decodeData(data, offset) {
+        for (var i=0, j=0; i<data.length; i+=4, j++) {
+            // ZXing.HEAPU8[image + j] = data[i];
+            ZXing.HEAPU8[offset + j] = 0.2989 * data[i + 0] + 0.5870 * data[i + 1] + 0.1140 * data[i + 2] ;
+        }
+
+        return ZXing._decode_qr(decodePtr);
+    }
+
 	function success(stream) {
 		console.log('success', stream);
 		video.src = window.URL.createObjectURL(stream);
 		video.onclick = function() { video.play(); };
 		video.play();
-
-		var decodeCallback = function(ptr, len, resultIndex, resultCount) {
-			var result = new Uint8Array(ZXing.HEAPU8.buffer, ptr, len);
-			var str = String.fromCharCode.apply(null, result);
-			decoded(str);
-		};
-		var decodePtr = ZXing.Runtime.addFunction(decodeCallback);
 
 		function getFrame() {
 			requestAnimationFrame(getFrame);
@@ -155,15 +164,6 @@ function testZXing() {
 
 			//console.timeEnd('a')
 		}
-
-        function decodeData(data, offset) {
-            for (var i=0, j=0; i<data.length; i+=4, j++) {
-                // ZXing.HEAPU8[image + j] = data[i];
-                ZXing.HEAPU8[offset + j] = 0.2989 * data[i + 0] + 0.5870 * data[i + 1] + 0.1140 * data[i + 2] ;
-            }
-
-            return ZXing._decode_qr(decodePtr);
-        }
 
 		getFrame();
 
