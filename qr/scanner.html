@@ -107,10 +107,19 @@
     <div id="my_result"></div>
 
     <script language="JavaScript">
+        var oStatus = document.getElementById("status");
+            oStatus.innerText = 'Scan en cours';
+
+        QCodeDecoder().decodeFromCamera(document.getElementById('my_camera'),function (err, result) {
+          if (err) oStatus.innerText = err;
+          oStatus.innerText = 'Scan fait!';
+
+          alert(result);
+        });
+        /*
         Webcam.attach( '#my_camera' );
 
         var running = false;
-        var oStatus = document.getElementById("status");
 
         Webcam.on('live', function(){
           if(!running){
@@ -153,6 +162,7 @@
             oStatus.classList.add('error');
           }
         }
+        */
     </script>
 </body>
 </html>
