@@ -73,7 +73,7 @@ function testZXing() {
 			if (resultIndex === 0) {
 				window.resultString = '';
 			}
-			alert(str);
+			alert(btoa(str));
 			window.resultString += str + '<br>';
 		};
 		var decodePtr = ZXing.Runtime.addFunction(decodeCallback);
