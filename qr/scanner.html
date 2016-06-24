@@ -104,8 +104,9 @@
 
   // Camera scanner
   if(QCodeDecoder().hasGetUserMedia()){
-    var oStatus = document.getElementById("status");
     QCodeDecoder().decodeFromCamera(document.getElementById('cameraPreview'),function (err, result) {
+      var oStatus = document.getElementById("status");
+      oStatus.innerText = "Lecture...";
       if (!err && result && result.length){
         var hash = btoa(result);
         var link = '../reader.html#pako-'+hash;
@@ -116,6 +117,7 @@
         oStatus.innerHTML = '<a href="'+link+'">Voir la recette associée</a>';
         oStatus.classList.add('success');
       } else {
+        oStatus.innerText = "Echec" + Math.random();
         console.log(err);
         console.log(result);
       }
