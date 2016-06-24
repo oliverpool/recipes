@@ -103,7 +103,7 @@ function testZXing() {
 			}
 
 			log('interval')
-			console.time('a')
+			//console.time('a')
 			ctx.drawImage(video, 0, 0, width, height);
 			var imageData = ctx.getImageData(0,0, width, height);
 			data = imageData.data;
@@ -132,6 +132,4 @@ function testZXing() {
 	};
 };
 </script>
-
-
-<canvas width="640" height="480" style="transform: scale(-1, 1);"></canvas></body></html>
+</body></html>
