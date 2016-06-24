@@ -118,7 +118,7 @@
           Webcam.snap( function(data_uri) {
             oStatus.innerText = 'took';
             QCodeDecoder().decodeFromImage(data_uri, snapshotProcessed);
-            oStatus.innerText = 'process';
+            oStatus.innerText = 'process' + data_uri;
           });
         }
         function snapshotProcessed(err, res) {
