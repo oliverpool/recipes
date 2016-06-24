@@ -10,23 +10,138 @@
 	</head>
 	<body id="body">
 		<img id="qr-img"/>
+		<canvas id="qr-canvas"></canvas>
 		<script type="text/javascript">
-		window.onload = function(){
+		var updateImg = function(){
 			var hash = location.hash.substr(1);
-			var i = hash.indexOf('-');
-			var algo = hash.slice(0,i);
-			var args = hash.slice(i+1);
-			if(algo != 'pako'){
+
+			var parts = hash.split('_');
+			var bstring = '';
+			var title = '';
+			for (var i = parts.length - 1; i >= 0; i--) {
+				var j = parts[i].indexOf('-');
+				var key = parts[i].slice(0,j);
+				var value = parts[i].slice(j+1);
+				switch (key) {
+					case 'pako':
+						bstring = atob(value);
+					break;
+					case 'title':
+						title = atob(value);
+					break;
+					default:
+						console.log('Unknown keyword: '+key);
+				}
+			}
+
+			if(!bstring.length){
 				alert('This kind of hash is not supported');
 				return;
 			}
-			var bstring = atob(args);
-			qr.image({
-			image: document.getElementById('qr-img'),
-			value: bstring,
-			size:15
+			var backColor = generateColor(title,false);
+
+			//QRcode
+			var qrCanvas = qr.canvas({
+				value: bstring,
+				size:15,
+				background: backColor
 			});
+
+			//Title
+			var text = title;
+			var textColor = generateColor(title, true);
+			var textFont = '18pt Calibri';
+			var lineHeight = 25;
+
+			//Title canvas
+			var textCanvas = document.createElement('canvas');
+		    textCanvas.width = qrCanvas.width;
+
+			var context = textCanvas.getContext('2d');
+			context.font = textFont;
+			var maxWidth = textCanvas.width;
+			var x = 0;
+			var y = lineHeight;
+
+			var lastline = wrapText(context, text, x, y, maxWidth, lineHeight);
+			if(!text.length){
+				lastline = 0;
+			}
+
+			//Merge
+			var canvas = document.createElement('canvas');
+			canvas.width = maxWidth;
+			canvas.height = lastline + qrCanvas.height;
+			context = canvas.getContext('2d');
+			context.fillStyle = backColor;
+			context.fillRect(0, 0, canvas.width, canvas.height);
+			context.font = textFont;
+			context.fillStyle = textColor;
+			wrapText(context, text, x, y, maxWidth, lineHeight);
+			context.drawImage(qrCanvas, 0, lastline);
+
+			//Display
+			var img = document.getElementById('qr-img');
+
+			// Apply the QR code to `img`.
+			img.src    = canvas.toDataURL('image/png');
+			img.height = canvas.height;
+			img.width  = canvas.width;
+
+			function wrapText(context, text, x, y, maxWidth, lineHeight) {
+				var words = text.split(' ');
+				var line = '';
+
+				for(var n = 0; n < words.length; n++) {
+				  var testLine = line + words[n] + ' ';
+				  var metrics = context.measureText(testLine);
+				  var testWidth = metrics.width;
+				  if (testWidth > maxWidth && n > 0) {
+				  	var paddingLeft = (maxWidth - context.measureText(line).width)/2;
+				    context.fillText(line, x+paddingLeft, y);
+				    line = words[n] + ' ';
+				    y += lineHeight;
+				  }
+				  else {
+				    line = testLine;
+				  }
+				}
+			  	var paddingLeft = (maxWidth - context.measureText(line).width)/2;
+				context.fillText(line, x+paddingLeft, y);
+				return y + (lineHeight/4);
+			}
+
+			function generateColor(str, title){
+				var hash;
+				if(str.length){
+					hash = (title)?charSum(str):hashCode(str);
+				} else {
+					hash = 360*Math.random();
+				}
+				if(title){
+				    return 'hsl('+ (hash%360) +',63%,46%)';
+				} else {
+				    return 'hsl('+ (hash%360) +',54%,88%)';
+				}
+			}
+			function charSum(str){
+			    var sum = 0;
+			    if (str.length == 0) return sum;
+			    for (i = 0; i < str.length; i++) {
+			        sum += str.charCodeAt(i);
+			    }
+			    return sum;
+			}
+			function hashCode(str) { // java String#hashCode
+				var hash = 0;
+				for (var i = 0; i < str.length; i++) {
+					hash = str.charCodeAt(i) + ((hash << 5) - hash);
+				}
+				return hash;
+			} 
 		};
+		window.onload = updateImg;
+		window.onhashchange = updateImg;
 		</script>
 	</body>
 </html>
